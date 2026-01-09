@@ -3,17 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verpasse nicht den Augenblick...</title>
+    <title>Ein magischer Augenblick erwartet dich</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;900&display=swap" rel="stylesheet">
+    <!-- Google Fonts Import für Google Sans Look-alike (Roboto) -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --g-blue: #4285F4;
             --g-red: #EA4335;
             --g-yellow: #FBBC05;
             --g-green: #34A853;
+            --star-blue: #81a0f4; /* Die neue Sternenfarbe */
+            --iris-color: #A7A1C7;
         }
 
         body, html {
@@ -21,11 +24,12 @@
             width: 100%; height: 100%;
             background-color: #000;
             color: #ffffff;
-            font-family: 'Inter', sans-serif;
+            /* Umstellung auf Google Sans Style */
+            font-family: 'Google Sans', 'Roboto', 'Inter', sans-serif;
             overflow: hidden;
         }
 
-        /* Intro Wrapper */
+        /* Intro Animation Layout */
         #intro-wrapper {
             position: fixed;
             top: 0; left: 0;
@@ -38,13 +42,12 @@
             pointer-events: none;
         }
 
-        /* Das neue statische Bild vom Pixel */
         #phone-static {
             width: auto;
             height: 75vh;
             object-fit: contain;
-            /* Präziser Zoom-Fokus auf die obere Kameralinse */
-            transform-origin: 50% 17%; 
+            /* Präziser Fokus auf die linke Linse der Pill-Kamera */
+            transform-origin: 43.1% 17.2%; 
             z-index: 10;
             opacity: 1;
         }
@@ -57,13 +60,14 @@
             opacity: 0;
         }
 
-        /* Landing Page Content */
+        /* Hauptinhalt der Webseite */
         #main-content {
             opacity: 0;
             visibility: hidden;
             height: 100%;
             overflow-y: auto;
             background-color: #000;
+            scroll-behavior: smooth;
         }
 
         .bg-glow {
@@ -73,7 +77,7 @@
 
         .glow-circle {
             position: absolute; border-radius: 50%;
-            filter: blur(120px); opacity: 0.12;
+            filter: blur(150px); opacity: 0.15;
             animation: drift 25s infinite alternate ease-in-out;
         }
 
@@ -95,10 +99,13 @@
         .magic-button {
             position: relative; background: white; color: black;
             padding: 1.25rem 3.5rem; border-radius: 99px;
-            font-weight: 900; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 0 30px rgba(255,255,255,0.05);
+            font-weight: 700; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 30px rgba(129, 160, 244, 0.2);
         }
-        .magic-button:hover { transform: scale(1.05); box-shadow: 0 0 50px rgba(255,255,255,0.15); }
+        .magic-button:hover { 
+            transform: scale(1.05); 
+            box-shadow: 0 0 50px rgba(129, 160, 244, 0.4); 
+        }
 
         #loader-text {
             position: absolute; bottom: 50px; left: 0; width: 100%;
@@ -110,34 +117,38 @@
 </head>
 <body>
 
+    <!-- Intro Animation Container -->
     <div id="intro-wrapper">
-        <img id="phone-static" src="https://i.postimg.cc/VkDfMc1n/image-global-P9a-2024Q3-24H077x008-B-IRIS-MASTER-SIMP-(1).png" alt="Innovation">
+        <img id="phone-static" src="https://i.postimg.cc/VkDfMc1n/image-global-P9a-2024Q3-24H077x008-B-IRIS-MASTER-SIMP-(1).png" alt="Mysteriöse Entdeckung">
         <div id="three-canvas-container"></div>
-        <div id="loader-text">Einen Augenblick bitte...</div>
+        <div id="loader-text">Wird vorbereitet...</div>
     </div>
 
+    <!-- Hauptinhalt -->
     <div id="main-content">
         <div class="bg-glow">
-            <div class="glow-circle w-[800px] h-[800px] top-[-20%] left-[-15%]" style="background: var(--g-blue);"></div>
-            <div class="glow-circle w-[700px] h-[700px] bottom-[-20%] right-[-15%]" style="background: var(--g-red);"></div>
+            <div class="glow-circle w-[800px] h-[800px] top-[-20%] left-[-15%]" style="background: var(--iris-color);"></div>
+            <div class="glow-circle w-[700px] h-[700px] bottom-[-20%] right-[-15%]" style="background: var(--star-blue);"></div>
             <div class="glow-circle w-[600px] h-[600px] top-[20%] right-[10%]" style="background: var(--g-yellow);"></div>
         </div>
 
+        <!-- Navigation -->
         <nav class="w-full py-10 px-12 flex justify-end items-center">
             <div class="flex space-x-12 text-[10px] font-bold tracking-[0.5em] text-gray-500 uppercase">
-                <a href="#teaser" class="hover:text-white transition">Erleben</a>
-                <a href="#event" class="hover:text-white transition">Dabeisein</a>
+                <a href="#teaser" class="hover:text-white transition">Vision</a>
+                <a href="#event" class="hover:text-white transition">18.02.2026</a>
             </div>
         </nav>
 
+        <!-- Hero Section -->
         <section class="min-h-[90vh] flex flex-col justify-center items-center px-6 text-center">
             <div id="hero-reveal">
-                <span class="text-xs font-bold tracking-[0.8em] text-blue-500 mb-8 block uppercase">Das nächste Kapitel</span>
-                <h1 class="text-6xl md:text-[10rem] font-black tracking-tighter mb-12 leading-none">
+                <span class="text-xs font-bold tracking-[0.8em] text-blue-500 mb-8 block uppercase">Ein neuer Horizont</span>
+                <h1 class="text-6xl md:text-[10rem] font-bold tracking-tighter mb-12 leading-none">
                     Verpasse nicht <br> <span class="gradient-text">den Augenblick...</span>
                 </h1>
                 <p class="max-w-2xl mx-auto text-xl md:text-2xl text-gray-400 font-light leading-relaxed mb-20">
-                    Eine neue Dimension der Intuition. Wir haben die Essenz dessen, was uns verbindet, neu interpretiert.
+                    Die Essenz der Verbundenheit, neu definiert. Sei am 18. Februar live dabei, wenn wir das Unvorstellbare enthüllen.
                 </p>
                 <div class="flex justify-center">
                     <button onclick="handleCalendarClick()" class="magic-button">
@@ -147,18 +158,30 @@
             </div>
         </section>
 
+        <!-- Video Teaser Section -->
         <section id="teaser" class="py-48 px-6">
             <div class="max-w-6xl mx-auto">
                 <div class="bg-white/5 backdrop-blur-3xl p-6 md:p-12 rounded-[50px] border border-white/5 shadow-2xl">
-                    <div class="aspect-video w-full rounded-[30px] overflow-hidden bg-black">
+                    <div class="aspect-video w-full rounded-[30px] overflow-hidden bg-black shadow-inner">
                         <iframe class="w-full h-full" src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?controls=0&modestbranding=1&rel=0" allowfullscreen></iframe>
                     </div>
                 </div>
+                <p class="text-center mt-12 text-gray-500 italic text-lg font-light">Ein erster Blick in eine magische Zukunft.</p>
             </div>
         </section>
 
-        <footer class="py-24 border-t border-white/5 text-center text-[10px] tracking-[0.6em] font-bold text-gray-800 uppercase">
-            &copy; 2026 Innovation Labs / 18. Februar 2026
+        <!-- Event Info Section -->
+        <section id="event" class="py-32 px-6 text-center">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-3xl md:text-5xl font-bold mb-8">Save the Date</h2>
+                <p class="text-gray-400 text-xl mb-12">18. Februar 2026 | Global Livestream</p>
+                <div class="w-24 h-1 bg-gradient-to-r from-blue-500 via-red-500 to-yellow-500 mx-auto rounded-full"></div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="py-24 border-t border-white/5 text-center text-[10px] tracking-[0.6em] font-bold text-gray-700 uppercase">
+            &copy; 2026 Innovation Labs / Magie in jedem Detail.
         </footer>
     </div>
 
@@ -171,15 +194,16 @@
         window.onload = () => {
             initSpaceScene();
             if (phoneImg.complete) {
-                setTimeout(startExperience, 1000);
+                setTimeout(startExperience, 1200);
             } else {
-                phoneImg.onload = () => setTimeout(startExperience, 1000);
+                phoneImg.onload = () => setTimeout(startExperience, 1200);
             }
         };
 
         function initSpaceScene() {
             scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 3000);
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 4000);
+            
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
@@ -187,36 +211,50 @@
 
             scene.add(new THREE.AmbientLight(0xffffff, 1.5));
             
-            // Sterne erstellen
             starGroup = new THREE.Group();
             const starGeometry = new THREE.BufferGeometry();
-            const starMaterial = new THREE.PointsMaterial({
-                color: 0xffffff,
-                size: 1.1,
-                transparent: true,
-                opacity: 0.9
-            });
-
+            
             const starVertices = [];
-            for (let i = 0; i < 7000; i++) {
+            const starColors = [];
+            
+            // Neue Sternenfarbe: HEX #81a0f4
+            const starBaseColor = new THREE.Color(0x81a0f4);
+            const secondaryColor = new THREE.Color(0xffffff); // Weiß für Funkeln
+
+            for (let i = 0; i < 9000; i++) {
                 const x = (Math.random() - 0.5) * 2000;
                 const y = (Math.random() - 0.5) * 2000;
-                const z = (Math.random() - 0.5) * 3500;
+                const z = (Math.random() - 0.5) * 4500;
                 starVertices.push(x, y, z);
+                
+                // Mische hauptsächlich #81a0f4 mit etwas Weiß für ein lebendiges All
+                const mixFactor = Math.random();
+                const finalColor = starBaseColor.clone().lerp(secondaryColor, mixFactor > 0.8 ? 0.4 : 0);
+                starColors.push(finalColor.r, finalColor.g, finalColor.b);
             }
+            
             starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
+            starGeometry.setAttribute('color', new THREE.Float32BufferAttribute(starColors, 3));
+            
+            const starMaterial = new THREE.PointsMaterial({
+                size: 1.4,
+                vertexColors: true,
+                transparent: true,
+                opacity: 1.0,
+                blending: THREE.AdditiveBlending
+            });
+
             const stars = new THREE.Points(starGeometry, starMaterial);
             starGroup.add(stars);
             scene.add(starGroup);
 
-            // Gemini Logo laden
             const loader = new THREE.TextureLoader();
             loader.setCrossOrigin('anonymous');
             loader.load('https://i.postimg.cc/xCJwpwmX/rectangle-gemini-google-icon-symbol-logo-free-png.png', (tex) => {
                 const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
                 geminiSprite = new THREE.Sprite(mat);
                 geminiSprite.scale.set(0.1, 0.1, 1);
-                geminiSprite.position.set(0, 0, -850); 
+                geminiSprite.position.set(0, 0, -1100); 
                 scene.add(geminiSprite);
             });
 
@@ -227,57 +265,56 @@
         function startExperience() {
             const tl = gsap.timeline({ onComplete: finalizeIntro });
 
-            // 1. Loader sanft weg
             tl.to("#loader-text", { opacity: 0, duration: 0.8 });
 
-            // 2. Kontinuierlicher Zoom in die obere Kameralinse
+            // 1. Zoom perfekt in das Schwarz der Linse
             tl.to(phoneImg, {
-                scale: 75, // Höherer Zoom für mehr Immersion in die Linse
-                duration: 4,
+                scale: 95, 
+                duration: 4.5,
                 ease: "power3.in"
             }, "-=0.4");
 
-            // 3. Weltraum früher einblenden für flüssigeren Übergang
+            // 2. Container aktivieren, während wir noch im schwarzen Bereich zoomen
             tl.to(threeContainer, {
                 opacity: 1,
-                duration: 1.2
-            }, "-=1.8");
+                duration: 1.0
+            }, "-=1.5");
 
-            // 4. Phone-Bild verschmilzt mit dem 3D-Schwarz
+            // 3. Phone-Bild ausblenden
             tl.to(phoneImg, {
                 opacity: 0,
                 duration: 0.4
-            }, "-=0.6");
-
-            // 5. Nahtloser Flug durch das All
-            tl.to(camera.position, {
-                z: -1000,
-                duration: 5.5,
-                ease: "power2.inOut"
             }, "-=0.8");
 
-            // 6. Gemini Logo wächst synchron zum Flug
+            // 4. Flug durch das All
+            tl.to(camera.position, {
+                z: -1100,
+                duration: 6,
+                ease: "power2.inOut"
+            }, "-=1.2");
+
+            // 5. Gemini Logo wächst synchron zum Flug
             tl.add(() => {
                 if(geminiSprite) {
                     gsap.to(geminiSprite.scale, { 
-                        x: 55, y: 55, duration: 4.5, ease: "power2.inOut" 
+                        x: 60, y: 60, duration: 5, ease: "power2.inOut" 
                     });
                     gsap.to(geminiSprite.position, {
-                        z: -1000, duration: 4.5, ease: "power2.inOut"
+                        z: -1100, duration: 5, ease: "power2.inOut"
                     });
                 }
-            }, "-=5.2");
+            }, "-=5.5");
 
-            // 7. Direkter Übergang beim Durchflug (Blitz)
+            // 6. Finaler Blitz-Übergang
             tl.to(introWrapper, {
                 backgroundColor: "#ffffff",
-                duration: 0.4,
+                duration: 0.5,
                 ease: "power2.in"
-            }, "-=0.4");
+            }, "-=0.5");
 
             tl.to(introWrapper, {
                 opacity: 0,
-                duration: 0.8,
+                duration: 1,
                 ease: "power2.out"
             });
         }
@@ -287,13 +324,12 @@
             if (!renderer || !scene || !camera) return;
 
             if(starGroup) {
-                // Konstanter Drift der Sterne
-                starGroup.position.z += 1.2;
-                if(starGroup.position.z > 1000) starGroup.position.z = 0;
+                starGroup.position.z += 2.2;
+                if(starGroup.position.z > 1500) starGroup.position.z = 0;
             }
             
             if(geminiSprite) {
-                geminiSprite.material.rotation += 0.0025;
+                geminiSprite.material.rotation += 0.003;
             }
             
             renderer.render(scene, camera);
@@ -305,13 +341,13 @@
             const main = document.getElementById('main-content');
             main.style.opacity = '1';
             main.style.visibility = 'visible';
-            gsap.from("#hero-reveal", { y: 60, opacity: 0, duration: 2, ease: "expo.out" });
+            gsap.from("#hero-reveal", { y: 70, opacity: 0, duration: 2, ease: "expo.out" });
         }
 
         function handleCalendarClick() {
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-            const title = "DER AUGENBLICK - Globaler Livestream";
-            const desc = "Erlebe die Enthüllung live: https://youtube.com/live/example";
+            const title = "LIVE: Ein magisches Event beginnt";
+            const desc = "Sei dabei, wenn wir das nächste Kapitel aufschlagen: https://youtube.com/live/example";
             const start = "20260218T180000Z";
             const end = "20260218T200000Z";
 
@@ -321,7 +357,7 @@
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = 'google_event.ics';
+                link.download = 'event-1802.ics';
                 link.click();
             } else {
                 window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${start}/${end}&details=${encodeURIComponent(desc)}`, "_blank");
