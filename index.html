@@ -134,6 +134,7 @@
             <div class="glow-circle w-[600px] h-[600px] top-[20%] right-[10%]" style="background: var(--g-yellow);"></div>
         </div>
 
+        <!-- Navigation -->
         <nav class="w-full py-10 px-12 flex justify-end items-center">
             <div class="flex space-x-12 text-[10px] font-bold tracking-[0.5em] text-gray-500 uppercase">
                 <a href="#teaser" class="hover:text-white transition">Vision</a>
@@ -267,8 +268,8 @@
                 });
             });
 
-            // Gemini Logo
-            loader.load('https://i.postimg.cc/xCJwpwmX/rectangle-gemini-google-icon-symbol-logo-free-png.png', (tex) => {
+            // Gemini Logo (Aktualisiert auf das 2025 Icon)
+            loader.load('https://i.postimg.cc/5Nr3VrfQ/Google-Gemini-icon-2025-svg.png', (tex) => {
                 const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
                 geminiSprite = new THREE.Sprite(mat);
                 geminiSprite.scale.set(0.1, 0.1, 1);
