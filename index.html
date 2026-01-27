@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+        <!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <!-- Google Fonts Import für Google Sans Look-alike (Roboto) -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -17,7 +16,6 @@
             --g-green: #34A853;
             --star-blue: #81a0f4; 
             --iris-color: #A7A1C7;
-            /* Farben für den Gradienten */
             --gradient-1: #81a0f4;
             --gradient-2: #ff5661;
             --gradient-3: #d9e3dc;
@@ -47,11 +45,16 @@
 
         #phone-static {
             width: auto;
-            height: 75vh;
+            height: 60vh; /* Etwas kleiner für Mobile-First, wächst via Media Query */
+            max-width: 90vw;
             object-fit: contain;
             transform-origin: 43.1% 17.2%; 
             z-index: 10;
             opacity: 1;
+        }
+
+        @media (min-width: 768px) {
+            #phone-static { height: 75vh; }
         }
 
         #three-canvas-container {
@@ -79,7 +82,7 @@
 
         .glow-circle {
             position: absolute; border-radius: 50%;
-            filter: blur(150px); opacity: 0.15;
+            filter: blur(100px); opacity: 0.15;
             animation: drift 25s infinite alternate ease-in-out;
         }
 
@@ -100,9 +103,13 @@
 
         .magic-button {
             position: relative; background: white; color: black;
-            padding: 1.25rem 3.5rem; border-radius: 99px;
+            padding: 1rem 2.5rem; border-radius: 99px;
             font-weight: 700; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             box-shadow: 0 0 30px rgba(129, 160, 244, 0.2);
+            font-size: 0.875rem;
+        }
+        @media (min-width: 768px) {
+            .magic-button { padding: 1.25rem 3.5rem; font-size: 1rem; }
         }
         .magic-button:hover { 
             transform: scale(1.05); 
@@ -114,6 +121,14 @@
             text-align: center; color: rgba(255,255,255,0.3);
             font-size: 9px; letter-spacing: 6px; text-transform: uppercase;
             font-weight: 600;
+        }
+
+        /* Fluid Typography for ultra large screens */
+        .text-hero {
+            font-size: clamp(2.5rem, 10vw, 10rem);
+        }
+        .text-subhero {
+            font-size: clamp(1.25rem, 4vw, 3.5rem);
         }
     </style>
 </head>
@@ -129,28 +144,32 @@
     <!-- Hauptinhalt -->
     <div id="main-content">
         <div class="bg-glow">
-            <div class="glow-circle w-[800px] h-[800px] top-[-20%] left-[-15%]" style="background: var(--iris-color);"></div>
-            <div class="glow-circle w-[700px] h-[700px] bottom-[-20%] right-[-15%]" style="background: var(--star-blue);"></div>
-            <div class="glow-circle w-[600px] h-[600px] top-[20%] right-[10%]" style="background: var(--g-yellow);"></div>
+            <div class="glow-circle w-[400px] md:w-[800px] h-[400px] md:h-[800px] top-[-10%] left-[-10%]" style="background: var(--iris-color);"></div>
+            <div class="glow-circle w-[350px] md:w-[700px] h-[350px] md:h-[700px] bottom-[-10%] right-[-10%]" style="background: var(--star-blue);"></div>
         </div>
 
         <!-- Navigation -->
-        <nav class="w-full py-10 px-12 flex justify-end items-center">
-            <div class="flex space-x-12 text-[10px] font-bold tracking-[0.5em] text-gray-500 uppercase">
+        <nav class="w-full py-6 md:py-10 px-6 md:px-12 flex justify-between md:justify-end items-center">
+            <div class="text-[10px] font-bold tracking-[0.2em] md:hidden">INNOVATION</div>
+            <div class="flex space-x-6 md:space-x-12 text-[10px] font-bold tracking-[0.5em] text-gray-500 uppercase">
                 <a href="#teaser" class="hover:text-white transition">Vision</a>
-                <a href="#event" class="hover:text-white transition">18.02.2026</a>
+                <a href="#event" class="hover:text-white transition">18.02.26</a>
             </div>
         </nav>
 
+        <!-- Hero Section -->
         <section class="min-h-[90vh] flex flex-col justify-center items-center px-6 text-center">
-            <div id="hero-reveal">
-                <span class="text-xs font-bold tracking-[0.8em] text-blue-500 mb-8 block uppercase">Ein neuer Horizont</span>
-                <h1 class="text-6xl md:text-[10rem] font-bold tracking-tighter mb-12 leading-none">
+            <div id="hero-reveal" class="w-full max-w-7xl mx-auto">
+                <span class="text-[10px] md:text-xs font-bold tracking-[0.6em] md:tracking-[0.8em] text-blue-500 mb-6 md:mb-8 block uppercase">Ein neuer Horizont</span>
+                
+                <h1 class="text-hero font-bold tracking-tighter mb-4 md:mb-8 leading-none">
                     Verpasse nicht <br> <span class="gradient-text">den Augenblick...</span>
                 </h1>
-                <p class="max-w-2xl mx-auto text-xl md:text-2xl text-gray-400 font-light leading-relaxed mb-20">
-                    Die Essenz der Verbundenheit, neu definiert. Sei am 18. Februar live dabei, wenn wir das Unvorstellbare enthüllen.
+                
+                <p class="max-w-5xl mx-auto text-subhero font-bold tracking-tight leading-tight md:leading-relaxed mb-12 md:mb-20 gradient-text">
+                    Computing neu definiert: <br class="hidden md:block"> Mehr Möglichkeiten für alle.
                 </p>
+
                 <div class="flex justify-center">
                     <button onclick="handleCalendarClick()" class="magic-button">
                         TERMIN SICHERN
@@ -159,25 +178,27 @@
             </div>
         </section>
 
-        <section id="teaser" class="py-48 px-6">
+        <!-- Video Teaser Section -->
+        <section id="teaser" class="py-24 md:py-48 px-6">
             <div class="max-w-6xl mx-auto">
-                <div class="bg-white/5 backdrop-blur-3xl p-6 md:p-12 rounded-[50px] border border-white/5 shadow-2xl">
-                    <div class="aspect-video w-full rounded-[30px] overflow-hidden bg-black shadow-inner">
+                <div class="bg-white/5 backdrop-blur-3xl p-3 md:p-12 rounded-[30px] md:rounded-[50px] border border-white/5 shadow-2xl">
+                    <div class="aspect-video w-full rounded-[20px] md:rounded-[30px] overflow-hidden bg-black shadow-inner">
                         <iframe class="w-full h-full" src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?controls=0&modestbranding=1&rel=0" allowfullscreen></iframe>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="event" class="py-32 px-6 text-center">
+        <!-- Event Footer Section -->
+        <section id="event" class="py-24 px-6 text-center">
             <div class="max-w-4xl mx-auto">
-                <h2 class="text-3xl md:text-5xl font-bold mb-8">Save the Date</h2>
-                <p class="text-gray-400 text-xl mb-12">18. Februar 2026 | Global Livestream</p>
-                <div class="w-24 h-1 bg-gradient-to-r from-blue-500 via-red-500 to-yellow-500 mx-auto rounded-full"></div>
+                <h2 class="text-2xl md:text-5xl font-bold mb-6 md:mb-8 tracking-tight">Save the Date</h2>
+                <p class="text-gray-400 text-lg md:text-xl mb-10 md:mb-12">18. Februar 2026 | Global Livestream</p>
+                <div class="w-16 md:w-24 h-1 bg-gradient-to-r from-blue-500 via-red-500 to-yellow-500 mx-auto rounded-full opacity-50"></div>
             </div>
         </section>
 
-        <footer class="py-24 border-t border-white/5 text-center text-[10px] tracking-[0.6em] font-bold text-gray-700 uppercase">
+        <footer class="py-16 md:py-24 border-t border-white/5 text-center text-[8px] md:text-[10px] tracking-[0.4em] md:tracking-[0.6em] font-bold text-gray-700 uppercase px-6">
             &copy; 2026 Innovation Labs / Magie in jedem Detail.
         </footer>
     </div>
@@ -188,6 +209,8 @@
         const phoneImg = document.getElementById('phone-static');
         const introWrapper = document.getElementById('intro-wrapper');
         const threeContainer = document.getElementById('three-canvas-container');
+
+        const isMobile = window.innerWidth < 768;
 
         const objectUrls = [
             'https://i.postimg.cc/BbyJsRFK/Endcard-opt3-width-1300.png',
@@ -206,11 +229,11 @@
 
         function initSpaceScene() {
             scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 4000);
+            camera = new THREE.PerspectiveCamera(isMobile ? 60 : 45, window.innerWidth / window.innerHeight, 0.1, 4000);
             
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             threeContainer.appendChild(renderer.domElement);
 
             scene.add(new THREE.AmbientLight(0xffffff, 1.5));
@@ -222,7 +245,8 @@
             const starBaseColor = new THREE.Color(0x81a0f4);
             const secondaryColor = new THREE.Color(0xffffff);
 
-            for (let i = 0; i < 9000; i++) {
+            const starCount = isMobile ? 5000 : 9000;
+            for (let i = 0; i < starCount; i++) {
                 const x = (Math.random() - 0.5) * 2000;
                 const y = (Math.random() - 0.5) * 2000;
                 const z = (Math.random() - 0.5) * 4500;
@@ -235,7 +259,7 @@
             starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
             starGeometry.setAttribute('color', new THREE.Float32BufferAttribute(starColors, 3));
             const starMaterial = new THREE.PointsMaterial({
-                size: 1.4,
+                size: isMobile ? 0.8 : 1.4,
                 vertexColors: true,
                 transparent: true,
                 opacity: 1.0,
@@ -249,26 +273,24 @@
             const loader = new THREE.TextureLoader();
             loader.setCrossOrigin('anonymous');
 
-            // Lade schwebende Objekte mit individueller Skalierung
             objectUrls.forEach((url, index) => {
                 loader.load(url, (tex) => {
                     const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0 });
                     const sprite = new THREE.Sprite(mat);
                     
-                    // Individuelle Größenanpassung: 1. und 3. Objekt größer
-                    let baseSize = 22;
+                    // Responsive Größenanpassung
+                    let baseSize = isMobile ? 18 : 22;
                     if (index === 0 || index === 2) {
-                        baseSize = 40; // Deutlich vergrößert
+                        baseSize = isMobile ? 30 : 40;
                     }
                     
                     sprite.scale.set(baseSize, baseSize * (tex.image.height / tex.image.width), 1);
-                    sprite.position.set((index % 2 === 0 ? 1.2 : -1.2) * 25, (index === 1 ? -8 : 8), -1200);
+                    sprite.position.set((index % 2 === 0 ? 1.2 : -1.2) * (isMobile ? 15 : 25), (index === 1 ? -6 : 6), -1200);
                     scene.add(sprite);
                     floatingObjects.push(sprite);
                 });
             });
 
-            // Gemini Logo (Aktualisiert auf das 2025 Icon)
             loader.load('https://i.postimg.cc/5Nr3VrfQ/Google-Gemini-icon-2025-svg.png', (tex) => {
                 const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
                 geminiSprite = new THREE.Sprite(mat);
@@ -286,9 +308,9 @@
 
             tl.to("#loader-text", { opacity: 0, duration: 0.8 });
 
-            // 1. Zoom in die Linse
+            // 1. Zoom in die Linse (Höherer Scale auf Mobile wegen kleinerem Ausgangsbild)
             tl.to(phoneImg, {
-                scale: 95, 
+                scale: isMobile ? 110 : 95, 
                 duration: 4.5,
                 ease: "power3.in"
             }, "-=0.4");
@@ -303,7 +325,6 @@
                 duration: 0.4
             }, "-=0.8");
 
-            // 2. Weltraumflug & Vorbeifliegende Objekte (Erhöhte Geschwindigkeit)
             const flightDuration = 12; 
             tl.to(camera.position, {
                 z: -1100,
@@ -311,10 +332,9 @@
                 ease: "power1.inOut"
             }, "-=1.2");
 
-            // Sequenz der vorbeifliegenden Objekte (Wieder schneller)
             floatingObjects.forEach((obj, index) => {
-                const startTime = index * 2.8 + 1.2; // Angepasstes Timing für schnelleren Flug
-                const moveDuration = 5.5; // Zurück zu schnellerer Geschwindigkeit
+                const startTime = index * 2.8 + 1.2; 
+                const moveDuration = 5.5; 
 
                 tl.to(obj.material, {
                     opacity: 1,
@@ -322,7 +342,7 @@
                 }, `-=${flightDuration - startTime}`);
 
                 tl.to(obj.position, {
-                    x: (index % 2 === 0 ? -1.8 : 1.8) * 35, 
+                    x: (index % 2 === 0 ? -1.8 : 1.8) * (isMobile ? 20 : 35), 
                     z: 500, 
                     duration: moveDuration,
                     ease: "none"
@@ -334,11 +354,11 @@
                 }, `-=${flightDuration - startTime - (moveDuration - 0.6)}`);
             });
 
-            // 3. Gemini Reveal
             tl.add(() => {
                 if(geminiSprite) {
+                    const geminiScale = isMobile ? 40 : 60;
                     gsap.to(geminiSprite.scale, { 
-                        x: 60, y: 60, duration: 4.5, ease: "power2.inOut" 
+                        x: geminiScale, y: geminiScale, duration: 4.5, ease: "power2.inOut" 
                     });
                     gsap.to(geminiSprite.position, {
                         z: -1100, duration: 4.5, ease: "power2.inOut"
@@ -385,7 +405,7 @@
             const main = document.getElementById('main-content');
             main.style.opacity = '1';
             main.style.visibility = 'visible';
-            gsap.from("#hero-reveal", { y: 70, opacity: 0, duration: 2, ease: "expo.out" });
+            gsap.from("#hero-reveal", { y: 30, opacity: 0, duration: 2, ease: "expo.out" });
         }
 
         function handleCalendarClick() {
@@ -410,9 +430,12 @@
 
         window.onresize = () => {
             if (!camera || !renderer) return;
-            camera.aspect = window.innerWidth / window.innerHeight;
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            camera.aspect = width / height;
+            camera.fov = width < 768 ? 60 : 45; // Breiterer FOV für Mobile
             camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setSize(width, height);
         };
     </script>
 </body>
