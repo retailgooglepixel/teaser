@@ -1,4 +1,4 @@
-        <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -45,7 +45,7 @@
 
         #phone-static {
             width: auto;
-            height: 60vh; /* Etwas kleiner für Mobile-First, wächst via Media Query */
+            height: 60vh;
             max-width: 90vw;
             object-fit: contain;
             transform-origin: 43.1% 17.2%; 
@@ -123,7 +123,7 @@
             font-weight: 600;
         }
 
-        /* Fluid Typography for ultra large screens */
+        /* Fluid Typography */
         .text-hero {
             font-size: clamp(2.5rem, 10vw, 10rem);
         }
@@ -152,7 +152,7 @@
         <nav class="w-full py-6 md:py-10 px-6 md:px-12 flex justify-between md:justify-end items-center">
             <div class="text-[10px] font-bold tracking-[0.2em] md:hidden">INNOVATION</div>
             <div class="flex space-x-6 md:space-x-12 text-[10px] font-bold tracking-[0.5em] text-gray-500 uppercase">
-                <a href="#teaser" class="hover:text-white transition">Vision</a>
+                <a href="#event" class="hover:text-white transition">Dabeisein</a>
                 <a href="#event" class="hover:text-white transition">18.02.26</a>
             </div>
         </nav>
@@ -178,22 +178,11 @@
             </div>
         </section>
 
-        <!-- Video Teaser Section -->
-        <section id="teaser" class="py-24 md:py-48 px-6">
-            <div class="max-w-6xl mx-auto">
-                <div class="bg-white/5 backdrop-blur-3xl p-3 md:p-12 rounded-[30px] md:rounded-[50px] border border-white/5 shadow-2xl">
-                    <div class="aspect-video w-full rounded-[20px] md:rounded-[30px] overflow-hidden bg-black shadow-inner">
-                        <iframe class="w-full h-full" src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?controls=0&modestbranding=1&rel=0" allowfullscreen></iframe>
-                    </div>
-                </div>
-            </div>
-        </section>
-
         <!-- Event Footer Section -->
-        <section id="event" class="py-24 px-6 text-center">
+        <section id="event" class="py-32 md:py-48 px-6 text-center">
             <div class="max-w-4xl mx-auto">
                 <h2 class="text-2xl md:text-5xl font-bold mb-6 md:mb-8 tracking-tight">Save the Date</h2>
-                <p class="text-gray-400 text-lg md:text-xl mb-10 md:mb-12">18. Februar 2026 | Global Livestream</p>
+                <p class="text-gray-400 text-lg md:text-xl mb-10 md:mb-12">18. Februar 2026 | Livestream</p>
                 <div class="w-16 md:w-24 h-1 bg-gradient-to-r from-blue-500 via-red-500 to-yellow-500 mx-auto rounded-full opacity-50"></div>
             </div>
         </section>
@@ -278,7 +267,6 @@
                     const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0 });
                     const sprite = new THREE.Sprite(mat);
                     
-                    // Responsive Größenanpassung
                     let baseSize = isMobile ? 18 : 22;
                     if (index === 0 || index === 2) {
                         baseSize = isMobile ? 30 : 40;
@@ -308,7 +296,6 @@
 
             tl.to("#loader-text", { opacity: 0, duration: 0.8 });
 
-            // 1. Zoom in die Linse (Höherer Scale auf Mobile wegen kleinerem Ausgangsbild)
             tl.to(phoneImg, {
                 scale: isMobile ? 110 : 95, 
                 duration: 4.5,
@@ -433,7 +420,7 @@
             const width = window.innerWidth;
             const height = window.innerHeight;
             camera.aspect = width / height;
-            camera.fov = width < 768 ? 60 : 45; // Breiterer FOV für Mobile
+            camera.fov = width < 768 ? 60 : 45;
             camera.updateProjectionMatrix();
             renderer.setSize(width, height);
         };
