@@ -130,9 +130,54 @@
         .text-subhero {
             font-size: clamp(1.25rem, 4vw, 3.5rem);
         }
+
+        /* Audio Toggle UI */
+        #audio-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 2000;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            pointer-events: auto;
+        }
+        #audio-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+        #audio-toggle svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+        }
     </style>
 </head>
 <body>
+
+    <!-- Audio Steuerung -->
+    <div id="audio-toggle" onclick="toggleAudio()">
+        <svg id="icon-sound-on" viewBox="0 0 24 24" style="display:none;"><path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18,19.86 21,16.28 21,12C21,7.72 18,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16.02C15.5,15.29 16.5,13.77 16.5,12M3,9V15H7L12,20V4L7,9H3Z" /></svg>
+        <svg id="icon-sound-off" viewBox="0 0 24 24"><path d="M12,4L9.91,6.09L12,8.18M4.27,3L3,4.27L7.73,9H3V15H7L12,20V13.27L16.25,17.53C15.58,18.04 14.83,18.46 14,18.7V20.77C15.38,20.45 16.63,19.82 17.68,18.96L19.73,21L21,19.73L12,10.73M19,12C19,12.94 18.8,13.82 18.46,14.64L19.97,16.15C20.62,14.91 21,13.5 21,12C21,7.72 18,4.14 14,3.23V5.29C16.89,6.15 19,8.83 19,12M16.5,12C16.5,10.23 15.5,8.71 14,7.97V10.18L16.45,12.63C16.48,12.43 16.5,12.22 16.5,12Z" /></svg>
+    </div>
+
+    <!-- Hintergrundmusik -->
+    <audio id="bg-music" loop>
+        <!-- 
+            WENN DU AUF GITHUB HOSTEST:
+            Lade deine mp3-Datei in das gleiche Verzeichnis wie die index.html hoch
+            und ändere den Namen hier unten entsprechend ab (z.B. src="musik.mp3").
+        -->
+        <source src="musik.mp3" type="audio/mpeg">
+    </audio>
 
     <!-- Intro Animation Container -->
     <div id="intro-wrapper">
@@ -195,9 +240,13 @@
     <script>
         let scene, camera, renderer, starGroup, geminiSprite;
         let floatingObjects = [];
+        let audioPlaying = false;
         const phoneImg = document.getElementById('phone-static');
         const introWrapper = document.getElementById('intro-wrapper');
         const threeContainer = document.getElementById('three-canvas-container');
+        const bgMusic = document.getElementById('bg-music');
+        const iconOn = document.getElementById('icon-sound-on');
+        const iconOff = document.getElementById('icon-sound-off');
 
         const isMobile = window.innerWidth < 768;
 
@@ -206,6 +255,25 @@
             'https://i.postimg.cc/GtSmtHWr/google-pixel-buds-a-series-sea.png',
             'https://i.postimg.cc/vT1dPXKx/Google-Tensor-G4-1.jpg'
         ];
+
+        function toggleAudio() {
+            if (audioPlaying) {
+                gsap.to(bgMusic, { volume: 0, duration: 1, onComplete: () => {
+                    bgMusic.pause();
+                    iconOn.style.display = 'none';
+                    iconOff.style.display = 'block';
+                }});
+            } else {
+                bgMusic.volume = 0;
+                bgMusic.play().then(() => {
+                    audioPlaying = true;
+                    gsap.to(bgMusic, { volume: 0.5, duration: 2 });
+                    iconOn.style.display = 'block';
+                    iconOff.style.display = 'none';
+                }).catch(e => console.log("Audio blockiert durch Browser-Sicherheitsrichtlinien."));
+            }
+            audioPlaying = !audioPlaying;
+        }
 
         window.onload = () => {
             initSpaceScene();
@@ -266,12 +334,8 @@
                 loader.load(url, (tex) => {
                     const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0 });
                     const sprite = new THREE.Sprite(mat);
-                    
                     let baseSize = isMobile ? 18 : 22;
-                    if (index === 0 || index === 2) {
-                        baseSize = isMobile ? 30 : 40;
-                    }
-                    
+                    if (index === 0 || index === 2) baseSize = isMobile ? 30 : 40;
                     sprite.scale.set(baseSize, baseSize * (tex.image.height / tex.image.width), 1);
                     sprite.position.set((index % 2 === 0 ? 1.2 : -1.2) * (isMobile ? 15 : 25), (index === 1 ? -6 : 6), -1200);
                     scene.add(sprite);
@@ -292,97 +356,54 @@
         }
 
         function startExperience() {
+            bgMusic.volume = 0;
+            bgMusic.play().then(() => {
+                audioPlaying = true;
+                gsap.to(bgMusic, { volume: 0.5, duration: 3 });
+                iconOn.style.display = 'block';
+                iconOff.style.display = 'none';
+            }).catch(() => {});
+
             const tl = gsap.timeline({ onComplete: finalizeIntro });
-
             tl.to("#loader-text", { opacity: 0, duration: 0.8 });
-
-            tl.to(phoneImg, {
-                scale: isMobile ? 110 : 95, 
-                duration: 4.5,
-                ease: "power3.in"
-            }, "-=0.4");
-
-            tl.to(threeContainer, {
-                opacity: 1,
-                duration: 1.0
-            }, "-=1.5");
-
-            tl.to(phoneImg, {
-                opacity: 0,
-                duration: 0.4
-            }, "-=0.8");
+            tl.to(phoneImg, { scale: isMobile ? 110 : 95, duration: 4.5, ease: "power3.in" }, "-=0.4");
+            tl.to(threeContainer, { opacity: 1, duration: 1.0 }, "-=1.5");
+            tl.to(phoneImg, { opacity: 0, duration: 0.4 }, "-=0.8");
 
             const flightDuration = 12; 
-            tl.to(camera.position, {
-                z: -1100,
-                duration: flightDuration,
-                ease: "power1.inOut"
-            }, "-=1.2");
+            tl.to(camera.position, { z: -1100, duration: flightDuration, ease: "power1.inOut" }, "-=1.2");
 
             floatingObjects.forEach((obj, index) => {
                 const startTime = index * 2.8 + 1.2; 
                 const moveDuration = 5.5; 
-
-                tl.to(obj.material, {
-                    opacity: 1,
-                    duration: 1.0
-                }, `-=${flightDuration - startTime}`);
-
-                tl.to(obj.position, {
-                    x: (index % 2 === 0 ? -1.8 : 1.8) * (isMobile ? 20 : 35), 
-                    z: 500, 
-                    duration: moveDuration,
-                    ease: "none"
-                }, `-=${flightDuration - startTime}`);
-
-                tl.to(obj.material, {
-                    opacity: 0,
-                    duration: 0.6
-                }, `-=${flightDuration - startTime - (moveDuration - 0.6)}`);
+                tl.to(obj.material, { opacity: 1, duration: 1.0 }, `-=${flightDuration - startTime}`);
+                tl.to(obj.position, { x: (index % 2 === 0 ? -1.8 : 1.8) * (isMobile ? 20 : 35), z: 500, duration: moveDuration, ease: "none" }, `-=${flightDuration - startTime}`);
+                tl.to(obj.material, { opacity: 0, duration: 0.6 }, `-=${flightDuration - startTime - (moveDuration - 0.6)}`);
             });
 
             tl.add(() => {
                 if(geminiSprite) {
                     const geminiScale = isMobile ? 40 : 60;
-                    gsap.to(geminiSprite.scale, { 
-                        x: geminiScale, y: geminiScale, duration: 4.5, ease: "power2.inOut" 
-                    });
-                    gsap.to(geminiSprite.position, {
-                        z: -1100, duration: 4.5, ease: "power2.inOut"
-                    });
+                    gsap.to(geminiSprite.scale, { x: geminiScale, y: geminiScale, duration: 4.5, ease: "power2.inOut" });
+                    gsap.to(geminiSprite.position, { z: -1100, duration: 4.5, ease: "power2.inOut" });
                 }
             }, "-=5.0");
 
-            tl.to(introWrapper, {
-                backgroundColor: "#ffffff",
-                duration: 0.5,
-                ease: "power2.in"
-            }, "-=0.5");
-
-            tl.to(introWrapper, {
-                opacity: 0,
-                duration: 1,
-                ease: "power2.out"
-            });
+            tl.to(introWrapper, { backgroundColor: "#ffffff", duration: 0.5, ease: "power2.in" }, "-=0.5");
+            tl.to(introWrapper, { opacity: 0, duration: 1, ease: "power2.out" });
         }
 
         function animate() {
             requestAnimationFrame(animate);
             if (!renderer || !scene || !camera) return;
-
             if(starGroup) {
                 starGroup.position.z += 2.5;
                 if(starGroup.position.z > 1500) starGroup.position.z = 0;
             }
-            
-            if(geminiSprite) {
-                geminiSprite.material.rotation += 0.003;
-            }
-
+            if(geminiSprite) geminiSprite.material.rotation += 0.003;
             floatingObjects.forEach((obj, i) => {
                 obj.material.rotation += (i % 2 === 0 ? 0.002 : -0.002);
             });
-            
             renderer.render(scene, camera);
         }
 
@@ -398,7 +419,7 @@
         function handleCalendarClick() {
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
             const title = "LIVE: Ein magisches Event beginnt";
-            const desc = "Sei dabei: https://youtube.com/live/example";
+            const desc = "Sei dabei: https://youtube.com/live/Lieiv2eLSrA?feature=share";
             const start = "20260218T180000Z";
             const end = "20260218T200000Z";
 
