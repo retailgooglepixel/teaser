@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Ein magischer Augenblick erwartet dich</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -28,30 +28,34 @@
             color: #ffffff;
             font-family: 'Google Sans', 'Roboto', 'Inter', sans-serif;
             overflow: hidden;
+            /* Verhindert Pull-to-refresh auf Mobile */
+            overscroll-behavior-y: none;
         }
 
         #intro-wrapper {
             position: fixed;
             top: 0; left: 0;
-            width: 100%; height: 100%;
+            width: 100%; height: 100dvh;
             z-index: 1000;
             background: #000;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
         }
 
         /* Start Button Design */
         #start-overlay {
             position: absolute;
+            top: 0; left: 0;
             z-index: 2000;
             display: flex;
             align-items: center;
             justify-content: center;
             width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.4);
-            backdrop-filter: blur(5px);
+            height: 100dvh;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
             transition: opacity 0.8s ease;
         }
 
@@ -59,10 +63,10 @@
             background: linear-gradient(90deg, var(--gradient-1), var(--gradient-2), var(--gradient-3), var(--gradient-1));
             background-size: 200% auto;
             color: white;
-            padding: 1.5rem 4rem;
+            padding: 1.25rem 3.5rem;
             border-radius: 999px;
             font-weight: 900;
-            font-size: 1.5rem;
+            font-size: clamp(1.2rem, 5vw, 1.5rem);
             text-transform: uppercase;
             letter-spacing: 0.2em;
             cursor: pointer;
@@ -77,14 +81,25 @@
             50% { transform: scale(1.05); }
         }
 
+        #phone-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         #phone-static {
             width: auto;
-            height: 60vh;
-            max-width: 90vw;
+            height: 85dvh; /* Größere Darstellung auf Mobile */
+            max-width: 95vw;
             object-fit: contain;
+            /* Präziser Fokus auf die Linse */
             transform-origin: 43.1% 17.2%; 
             z-index: 10;
             opacity: 1;
+            will-change: transform;
         }
 
         @media (min-width: 768px) {
@@ -97,6 +112,7 @@
             width: 100%; height: 100%;
             z-index: 5;
             opacity: 0;
+            pointer-events: none;
         }
 
         #main-content {
@@ -150,17 +166,17 @@
         }
 
         #loader-text {
-            position: absolute; bottom: 50px; left: 0; width: 100%;
+            position: absolute; bottom: 30px; left: 0; width: 100%;
             text-align: center; color: rgba(255,255,255,0.3);
             font-size: 9px; letter-spacing: 6px; text-transform: uppercase;
             font-weight: 600;
         }
 
         .text-hero {
-            font-size: clamp(2.5rem, 10vw, 10rem);
+            font-size: clamp(2.2rem, 9vw, 10rem);
         }
         .text-subhero {
-            font-size: clamp(1.25rem, 4vw, 3.5rem);
+            font-size: clamp(1.1rem, 4vw, 3.5rem);
         }
     </style>
 </head>
@@ -176,12 +192,16 @@
         <button class="btn-start" onclick="initExperience()">Start</button>
     </div>
 
+    <!-- Intro Animation -->
     <div id="intro-wrapper">
-        <img id="phone-static" src="https://i.postimg.cc/VkDfMc1n/image-global-P9a-2024Q3-24H077x008-B-IRIS-MASTER-SIMP-(1).png" alt="Mysteriöse Entdeckung">
+        <div id="phone-container">
+            <img id="phone-static" src="https://i.postimg.cc/VkDfMc1n/image-global-P9a-2024Q3-24H077x008-B-IRIS-MASTER-SIMP-(1).png" alt="Mysteriöse Entdeckung">
+        </div>
         <div id="three-canvas-container"></div>
         <div id="loader-text">Bereit für die Enthüllung</div>
     </div>
 
+    <!-- Hauptseite -->
     <div id="main-content">
         <div class="bg-glow">
             <div class="glow-circle w-[400px] md:w-[800px] h-[400px] md:h-[800px] top-[-10%] left-[-10%]" style="background: var(--iris-color);"></div>
@@ -247,7 +267,6 @@
             'https://i.postimg.cc/vT1dPXKx/Google-Tensor-G4-1.jpg'
         ];
 
-        // Start-Funktion getriggert durch den Button
         function initExperience() {
             startOverlay.style.opacity = '0';
             setTimeout(() => {
@@ -290,7 +309,7 @@
             const starColors = [];
             const starBaseColor = new THREE.Color(0x81a0f4);
             const secondaryColor = new THREE.Color(0xffffff);
-            const starCount = isMobile ? 5000 : 9000;
+            const starCount = isMobile ? 4000 : 9000;
 
             for (let i = 0; i < starCount; i++) {
                 const x = (Math.random() - 0.5) * 2000;
@@ -304,7 +323,7 @@
             
             starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
             starGeometry.setAttribute('color', new THREE.Float32BufferAttribute(starColors, 3));
-            const stars = new THREE.Points(starGeometry, new THREE.PointsMaterial({ size: isMobile ? 0.8 : 1.4, vertexColors: true, transparent: true, opacity: 1.0, blending: THREE.AdditiveBlending }));
+            const stars = new THREE.Points(starGeometry, new THREE.PointsMaterial({ size: isMobile ? 1.0 : 1.4, vertexColors: true, transparent: true, opacity: 1.0, blending: THREE.AdditiveBlending }));
             starGroup.add(stars);
             scene.add(starGroup);
 
@@ -315,7 +334,7 @@
                     const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0 });
                     const sprite = new THREE.Sprite(mat);
                     let baseSize = isMobile ? 18 : 22;
-                    if (index === 0 || index === 2) baseSize = isMobile ? 30 : 40;
+                    if (index === 0 || index === 2) baseSize = isMobile ? 32 : 40;
                     sprite.scale.set(baseSize, baseSize * (tex.image.height / tex.image.width), 1);
                     sprite.position.set((index % 2 === 0 ? 1.2 : -1.2) * (isMobile ? 15 : 25), (index === 1 ? -6 : 6), -1200);
                     scene.add(sprite);
@@ -337,10 +356,17 @@
         function startExperience() {
             playIntroMusic();
             const tl = gsap.timeline({ onComplete: finalizeIntro });
-            tl.to("#loader-text", { opacity: 0, duration: 0.8 });
-            tl.to(phoneImg, { scale: isMobile ? 110 : 95, duration: 4.5, ease: "power3.in" }, "-=0.4");
-            tl.to(threeContainer, { opacity: 1, duration: 1.0 }, "-=1.5");
-            tl.to(phoneImg, { opacity: 0, duration: 0.4 }, "-=0.8");
+            tl.to("#loader-text", { opacity: 0, duration: 0.5 });
+
+            // ZOOM OPTIMIERUNG
+            tl.to(phoneImg, { 
+                scale: isMobile ? 130 : 100, // Deutlich mehr Scale auf Mobile um die Kamerapille auszufüllen
+                duration: 4.8, 
+                ease: "power4.in" 
+            }, "-=0.2");
+
+            tl.to(threeContainer, { opacity: 1, duration: 1.0 }, "-=1.8");
+            tl.to(phoneImg, { opacity: 0, duration: 0.3 }, "-=0.6");
 
             const flightDuration = 12; 
             tl.to(camera.position, { z: -1100, duration: flightDuration, ease: "power1.inOut" }, "-=1.2");
@@ -355,7 +381,7 @@
 
             tl.add(() => {
                 if(geminiSprite) {
-                    const geminiScale = isMobile ? 40 : 60;
+                    const geminiScale = isMobile ? 45 : 60;
                     gsap.to(geminiSprite.scale, { x: geminiScale, y: geminiScale, duration: 4.5, ease: "power2.inOut" });
                     gsap.to(geminiSprite.position, { z: -1100, duration: 4.5, ease: "power2.inOut" });
                 }
@@ -389,7 +415,6 @@
         }
 
         function handleCalendarClick() {
-            // Robustere Apple-Erkennung (berücksichtigt MacBooks und iPads mit Desktop-UA)
             const isApple = /Macintosh|MacIntel|MacPPC|Mac68K|iPhone|iPad|iPod/.test(navigator.platform) || 
                             (navigator.userAgent.includes("Mac") && "ontouchend" in document);
 
@@ -410,12 +435,10 @@ Sichere dir jetzt deinen Platz!
 
 🔴🔴🔴 LIVESTREAM LINK: ${streamLink}`;
 
-            // UTC Zeiten für 18:30 Uhr MEZ (Februar = UTC+1)
             const startTime = "20260218T173000Z";
             const endTime = "20260218T193000Z";
 
             if (isApple) {
-                // .ics Datei für Apple Kalender (iOS & macOS)
                 const icsContent = [
                     "BEGIN:VCALENDAR",
                     "VERSION:2.0",
@@ -438,8 +461,6 @@ Sichere dir jetzt deinen Platz!
                 link.click();
                 document.body.removeChild(link);
             } else {
-                // Google Kalender Link für Windows/Android/Chrome
-                // Wichtig: encodeURIComponent stellt sicher, dass der gesamte Text in der URL landet
                 const gCalUrl = "https://calendar.google.com/calendar/render?action=TEMPLATE" +
                                 "&text=" + encodeURIComponent(title) +
                                 "&dates=" + startTime + "/" + endTime +
@@ -452,6 +473,7 @@ Sichere dir jetzt deinen Platz!
         window.onresize = () => {
             if (!camera || !renderer) return;
             camera.aspect = window.innerWidth / window.innerHeight;
+            camera.fov = window.innerWidth < 768 ? 60 : 45;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         };
