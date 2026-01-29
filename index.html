@@ -39,7 +39,42 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            pointer-events: none;
+        }
+
+        /* Start Button Design */
+        #start-overlay {
+            position: absolute;
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(5px);
+            transition: opacity 0.8s ease;
+        }
+
+        .btn-start {
+            background: linear-gradient(90deg, var(--gradient-1), var(--gradient-2), var(--gradient-3), var(--gradient-1));
+            background-size: 200% auto;
+            color: white;
+            padding: 1.5rem 4rem;
+            border-radius: 999px;
+            font-weight: 900;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 50px rgba(129, 160, 244, 0.4);
+            animation: shine 3s linear infinite, pulse 2s ease-in-out infinite;
+            pointer-events: auto;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
 
         #phone-static {
@@ -131,15 +166,20 @@
 </head>
 <body>
 
-    <!-- Hintergrundmusik - Ohne Loop-Attribut -->
+    <!-- Musik Element -->
     <audio id="bg-music" preload="auto">
         <source src="./musik.mp3" type="audio/mpeg">
     </audio>
 
+    <!-- Start Overlay -->
+    <div id="start-overlay">
+        <button class="btn-start" onclick="initExperience()">Start</button>
+    </div>
+
     <div id="intro-wrapper">
         <img id="phone-static" src="https://i.postimg.cc/VkDfMc1n/image-global-P9a-2024Q3-24H077x008-B-IRIS-MASTER-SIMP-(1).png" alt="Mysteriöse Entdeckung">
         <div id="three-canvas-container"></div>
-        <div id="loader-text">Wird vorbereitet...</div>
+        <div id="loader-text">Bereit für die Enthüllung</div>
     </div>
 
     <div id="main-content">
@@ -197,6 +237,7 @@
         const introWrapper = document.getElementById('intro-wrapper');
         const threeContainer = document.getElementById('three-canvas-container');
         const bgMusic = document.getElementById('bg-music');
+        const startOverlay = document.getElementById('start-overlay');
 
         const isMobile = window.innerWidth < 768;
 
@@ -206,53 +247,41 @@
             'https://i.postimg.cc/vT1dPXKx/Google-Tensor-G4-1.jpg'
         ];
 
-        // Verbesserte Audio-Logik
+        // Start-Funktion getriggert durch den Button
+        function initExperience() {
+            startOverlay.style.opacity = '0';
+            setTimeout(() => {
+                startOverlay.style.display = 'none';
+                startExperience();
+            }, 800);
+        }
+
         function playIntroMusic() {
             if (audioHasStarted) return;
-            
-            // Versuche den Audio-Kontext zu entsperren
             bgMusic.volume = 0;
             bgMusic.play().then(() => {
                 audioHasStarted = true;
                 gsap.to(bgMusic, { volume: 0.5, duration: 3 });
-                
-                // Stopp nach 18 Sekunden
                 setTimeout(() => {
                     gsap.to(bgMusic, { volume: 0, duration: 2, onComplete: () => {
                         bgMusic.pause();
                         bgMusic.currentTime = 0;
                     }});
                 }, 18000);
-            }).catch(e => {
-                console.log("Audio wartet auf User-Interaktion...");
-            });
+            }).catch(e => console.log("Audio blockiert"));
         }
-
-        // Globaler Listener für die erste Interaktion, um Audio zu entsperren
-        ['click', 'touchstart', 'pointerdown', 'wheel'].forEach(evt => {
-            window.addEventListener(evt, () => {
-                if (!audioHasStarted) playIntroMusic();
-            }, { once: true });
-        });
 
         window.onload = () => {
             initSpaceScene();
-            if (phoneImg.complete) {
-                setTimeout(startExperience, 1200);
-            } else {
-                phoneImg.onload = () => setTimeout(startExperience, 1200);
-            }
         };
 
         function initSpaceScene() {
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(isMobile ? 60 : 45, window.innerWidth / window.innerHeight, 0.1, 4000);
-            
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             threeContainer.appendChild(renderer.domElement);
-
             scene.add(new THREE.AmbientLight(0xffffff, 1.5));
             
             starGroup = new THREE.Group();
@@ -261,8 +290,8 @@
             const starColors = [];
             const starBaseColor = new THREE.Color(0x81a0f4);
             const secondaryColor = new THREE.Color(0xffffff);
-
             const starCount = isMobile ? 5000 : 9000;
+
             for (let i = 0; i < starCount; i++) {
                 const x = (Math.random() - 0.5) * 2000;
                 const y = (Math.random() - 0.5) * 2000;
@@ -275,21 +304,12 @@
             
             starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
             starGeometry.setAttribute('color', new THREE.Float32BufferAttribute(starColors, 3));
-            const starMaterial = new THREE.PointsMaterial({
-                size: isMobile ? 0.8 : 1.4,
-                vertexColors: true,
-                transparent: true,
-                opacity: 1.0,
-                blending: THREE.AdditiveBlending
-            });
-
-            const stars = new THREE.Points(starGeometry, starMaterial);
+            const stars = new THREE.Points(starGeometry, new THREE.PointsMaterial({ size: isMobile ? 0.8 : 1.4, vertexColors: true, transparent: true, opacity: 1.0, blending: THREE.AdditiveBlending }));
             starGroup.add(stars);
             scene.add(starGroup);
 
             const loader = new THREE.TextureLoader();
             loader.setCrossOrigin('anonymous');
-
             objectUrls.forEach((url, index) => {
                 loader.load(url, (tex) => {
                     const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0 });
@@ -310,14 +330,12 @@
                 geminiSprite.position.set(0, 0, -1100); 
                 scene.add(geminiSprite);
             });
-
             camera.position.z = 200;
             animate();
         }
 
         function startExperience() {
             playIntroMusic();
-
             const tl = gsap.timeline({ onComplete: finalizeIntro });
             tl.to("#loader-text", { opacity: 0, duration: 0.8 });
             tl.to(phoneImg, { scale: isMobile ? 110 : 95, duration: 4.5, ease: "power3.in" }, "-=0.4");
@@ -371,30 +389,41 @@
         }
 
         function handleCalendarClick() {
-            const isApple = /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent);
+            // Robustere Apple-Erkennung (berücksichtigt MacBooks und iPads mit Desktop-UA)
+            const isApple = /Macintosh|MacIntel|MacPPC|Mac68K|iPhone|iPad|iPod/.test(navigator.platform) || 
+                            (navigator.userAgent.includes("Mac") && "ontouchend" in document);
+
             const title = "Google Pixel 10a Launch Event";
             const streamLink = "https://youtube.com/live/Lieiv2eLSrA?feature=share";
             
-            // Beschreibungstext
-            const description = "Sei live dabei, wenn das neue Google Pixel 10a angekündigt wird!\n\nUnsere Google-Experten versorgen dich sofort mit allen Details.\n\nDas erwartet dich in unserem Live-Stream:\n\n🎥 Live-Reaction: Erlebe die Enthüllung in Echtzeit.\n💡 Exklusive Insights: Alles, was du über das neue Device wissen musst.\n🚀 Entertainment für alle: Egal ob Tech-Profi oder einfach nur neugierig.\n\nSichere dir jetzt deinen Platz!\n\n🔴🔴🔴 LIVESTREAM LINK: " + streamLink;
+            const descriptionText = `Sei live dabei, wenn das neue Google Pixel 10a angekündigt wird!
 
-            // Zeit-Parameter: 18:30 Uhr deutscher Zeit (UTC+1 im Feb) = 17:30 UTC
+Unsere Google-Experten versorgen dich sofort mit allen Details.
+
+Das erwartet dich in unserem Live-Stream:
+
+🎥 Live-Reaction: Erlebe die Enthüllung in Echtzeit.
+💡 Exklusive Insights: Alles, was du über das neue Device wissen musst.
+🚀 Entertainment für alle: Egal ob Tech-Profi oder einfach nur neugierig.
+
+Sichere dir jetzt deinen Platz!
+
+🔴🔴🔴 LIVESTREAM LINK: ${streamLink}`;
+
+            // UTC Zeiten für 18:30 Uhr MEZ (Februar = UTC+1)
             const startTime = "20260218T173000Z";
             const endTime = "20260218T193000Z";
 
             if (isApple) {
-                // Generiere .ics Datei für native Kalender-Apps
+                // .ics Datei für Apple Kalender (iOS & macOS)
                 const icsContent = [
                     "BEGIN:VCALENDAR",
                     "VERSION:2.0",
-                    "PRODID:-//Innovation Labs//DE",
                     "BEGIN:VEVENT",
-                    "UID:" + Date.now() + "@innovation-labs.de",
-                    "DTSTAMP:" + startTime,
                     "DTSTART:" + startTime,
                     "DTEND:" + endTime,
                     "SUMMARY:" + title,
-                    "DESCRIPTION:" + description.replace(/\n/g, "\\n"),
+                    "DESCRIPTION:" + descriptionText.replace(/\n/g, "\\n"),
                     "LOCATION:YouTube Live",
                     "END:VEVENT",
                     "END:VCALENDAR"
@@ -409,11 +438,12 @@
                 link.click();
                 document.body.removeChild(link);
             } else {
-                // Google Kalender Template für Browser/Android
+                // Google Kalender Link für Windows/Android/Chrome
+                // Wichtig: encodeURIComponent stellt sicher, dass der gesamte Text in der URL landet
                 const gCalUrl = "https://calendar.google.com/calendar/render?action=TEMPLATE" +
                                 "&text=" + encodeURIComponent(title) +
                                 "&dates=" + startTime + "/" + endTime +
-                                "&details=" + encodeURIComponent(description) +
+                                "&details=" + encodeURIComponent(descriptionText) +
                                 "&location=YouTube%20Live";
                 window.open(gCalUrl, "_blank");
             }
@@ -421,12 +451,9 @@
 
         window.onresize = () => {
             if (!camera || !renderer) return;
-            const width = window.innerWidth;
-            const height = window.innerHeight;
-            camera.aspect = width / height;
-            camera.fov = width < 768 ? 60 : 45;
+            camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
-            renderer.setSize(width, height);
+            renderer.setSize(window.innerWidth, window.innerHeight);
         };
     </script>
 </body>
