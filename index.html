@@ -3,20 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#000000">
+    
+    <!-- Mobile Web App Tags für "Zum Home-Bildschirm hinzufügen" -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#000000">
+
     <title>Ein magischer Augenblick erwartet dich</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --g-blue: #4285F4;
-            --g-red: #EA4335;
-            --g-yellow: #FBBC05;
-            --g-green: #34A853;
             --star-blue: #81a0f4; 
             --iris-color: #A7A1C7;
             --gradient-1: #81a0f4;
@@ -32,7 +34,7 @@
             font-family: 'Google Sans', 'Roboto', 'Inter', sans-serif;
             overflow: hidden;
             overscroll-behavior-y: none;
-            position: fixed;
+            position: fixed; /* Fixiert den Viewport gegen Browser-Leisten-Springen */
         }
 
         #intro-wrapper {
@@ -54,8 +56,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 100%;
-            height: 100dvh;
+            width: 100%; height: 100dvh;
             background: #000;
             transition: opacity 0.8s ease;
         }
@@ -83,8 +84,7 @@
 
         #phone-container {
             position: relative;
-            width: 100%;
-            height: 100dvh;
+            width: 100%; height: 100dvh;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -92,16 +92,17 @@
 
         #phone-static {
             width: auto;
-            height: 82dvh;
-            max-width: 95vw;
+            height: 80dvh;
+            max-width: 90vw;
             object-fit: contain;
-            /* Präziser Fokus auf die Mitte der Kamerapille für Mobile */
-            transform-origin: 43.5% 17.1%; 
+            /* FEINJUSTIERUNG: Fokus exakt auf die Kamerapille */
+            transform-origin: 50% 17.5%; 
             z-index: 10;
             opacity: 1;
             will-change: transform, opacity;
         }
 
+        /* Desktop Anpassung */
         @media (min-width: 768px) {
             #phone-static { 
                 height: 75vh;
@@ -126,7 +127,6 @@
             overflow-y: auto;
             background-color: #000;
             scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
         }
 
         .bg-glow {
@@ -138,6 +138,11 @@
             position: absolute; border-radius: 50%;
             filter: blur(100px); opacity: 0.15;
             animation: drift 25s infinite alternate ease-in-out;
+        }
+
+        @keyframes drift {
+            from { transform: translate(-10%, -10%) scale(1); }
+            to { transform: translate(20%, 20%) scale(1.2); }
         }
 
         .gradient-text {
@@ -181,7 +186,7 @@
             <img id="phone-static" src="https://i.postimg.cc/VkDfMc1n/image-global-P9a-2024Q3-24H077x008-B-IRIS-MASTER-SIMP-(1).png" alt="Phone">
         </div>
         <div id="three-canvas-container"></div>
-        <div id="loader-text">Enthüllung wird vorbereitet...</div>
+        <div id="loader-text">Wird vorbereitet...</div>
     </div>
 
     <div id="main-content">
@@ -192,9 +197,7 @@
 
         <nav class="w-full py-8 px-8 flex justify-between items-center">
             <div class="text-[10px] font-bold tracking-[0.2em] text-white/40">INNOVATION</div>
-            <div class="flex space-x-6 text-[10px] font-bold tracking-[0.3em] text-gray-400 uppercase">
-                <a href="#event" class="hover:text-white transition">18.02.26</a>
-            </div>
+            <div class="text-[10px] font-bold tracking-[0.3em] text-gray-400 uppercase">18.02.26</div>
         </nav>
 
         <section class="min-h-[80vh] flex flex-col justify-center items-center px-8 text-center">
@@ -242,14 +245,15 @@
             'https://i.postimg.cc/vT1dPXKx/Google-Tensor-G4-1.jpg'
         ];
 
-        function toggleFullScreen() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(() => {});
-            }
+        function requestFullscreen() {
+            const el = document.documentElement;
+            if (el.requestFullscreen) el.requestFullscreen();
+            else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+            else if (el.mozRequestFullScreen) el.mozRequestFullScreen();
         }
 
         function initExperience() {
-            if (isMobile) toggleFullScreen();
+            if (isMobile) requestFullscreen();
             startOverlay.style.opacity = '0';
             setTimeout(() => {
                 startOverlay.style.display = 'none';
@@ -263,7 +267,7 @@
             bgMusic.play().then(() => {
                 audioHasStarted = true;
                 gsap.to(bgMusic, { volume: 0.5, duration: 2 });
-            }).catch(e => console.log("Audio blockiert"));
+            }).catch(() => {});
         }
 
         window.onload = () => {
@@ -283,9 +287,7 @@
             starGroup = new THREE.Group();
             const starGeometry = new THREE.BufferGeometry();
             const starVertices = [];
-            const starCount = isMobile ? 4000 : 9000;
-
-            for (let i = 0; i < starCount; i++) {
+            for (let i = 0; i < (isMobile ? 4000 : 9000); i++) {
                 starVertices.push((Math.random()-0.5)*2500, (Math.random()-0.5)*2500, (Math.random()-0.5)*5000);
             }
             starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
@@ -296,7 +298,6 @@
             const loader = new THREE.TextureLoader();
             loader.setCrossOrigin('anonymous');
 
-            // Lade schwebende Objekte wieder ein
             objectUrls.forEach((url, index) => {
                 loader.load(url, (tex) => {
                     const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0 });
@@ -304,7 +305,6 @@
                     let baseSize = isMobile ? 18 : 25;
                     if (index === 0 || index === 2) baseSize = isMobile ? 30 : 45;
                     sprite.scale.set(baseSize, baseSize * (tex.image.height / tex.image.width), 1);
-                    // Startposition weit hinten im All
                     sprite.position.set((index % 2 === 0 ? 1.5 : -1.5) * (isMobile ? 25 : 40), (index === 1 ? -10 : 10), -1500);
                     scene.add(sprite);
                     floatingObjects.push(sprite);
@@ -329,40 +329,25 @@
 
             tl.to("#loader-text", { opacity: 0, duration: 0.3 });
 
-            // ZOOM DURCH DAS HANDY
-            // Scale von 500x sorgt dafür, dass die schwarze Pille den gesamten Screen füllt
+            // MASSIVER ZOOM DURCH DIE LINSE
+            // Scale von 600x für extremen Fokus-Eintritt
             tl.to(phoneImg, { 
-                scale: isMobile ? 500 : 120, 
+                scale: isMobile ? 600 : 120, 
                 duration: 5.5, 
                 ease: "power3.in" 
             });
 
-            tl.to(threeContainer, { 
-                opacity: 1, 
-                duration: 1.5 
-            }, "-=1.8");
+            tl.to(threeContainer, { opacity: 1, duration: 1.5 }, "-=1.8");
+            tl.to(phoneImg, { opacity: 0, duration: 0.5 }, "-=0.5");
 
-            tl.to(phoneImg, { 
-                opacity: 0, 
-                duration: 0.5 
-            }, "-=0.5");
+            tl.to(camera.position, { z: -1200, duration: 11, ease: "power2.inOut" }, "-=1.5");
 
-            // Flug durch das All
-            tl.to(camera.position, { 
-                z: -1200, 
-                duration: 11, 
-                ease: "power2.inOut" 
-            }, "-=1.5");
-
-            // Schwebende Objekte einfliegen lassen
             floatingObjects.forEach((obj, index) => {
                 const startTime = index * 2.5 + 2;
                 tl.to(obj.material, { opacity: 1, duration: 1 }, `-=${11 - startTime}`);
                 tl.to(obj.position, { 
                     x: (index % 2 === 0 ? -2.5 : 2.5) * (isMobile ? 30 : 50), 
-                    z: 600, 
-                    duration: 6, 
-                    ease: "none" 
+                    z: 600, duration: 6, ease: "none" 
                 }, `-=${11 - startTime}`);
                 tl.to(obj.material, { opacity: 0, duration: 1 }, `-=${11 - startTime - 5}`);
             });
@@ -403,7 +388,7 @@
         function handleCalendarClick() {
             const isApple = /iPhone|iPad|iPod/.test(navigator.userAgent);
             const title = "Google Pixel 10a Launch Event";
-            const desc = "Sei live dabei beim Launch des Pixel 10a! Dauer ca. 45 Min. \nLink: https://youtube.com/live/Lieiv2eLSrA";
+            const desc = "Sei live dabei beim Launch des Pixel 10a! \nLink: https://youtube.com/live/Lieiv2eLSrA";
             const start = "20260218T180000Z"; 
             const end = "20260218T184500Z";
 
@@ -413,7 +398,7 @@
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = 'pixel-event.ics';
+                a.download = 'event.ics';
                 a.click();
             } else {
                 window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${start}/${end}&details=${encodeURIComponent(desc)}`, "_blank");
