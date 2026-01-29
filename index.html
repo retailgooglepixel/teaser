@@ -28,7 +28,6 @@
             color: #ffffff;
             font-family: 'Google Sans', 'Roboto', 'Inter', sans-serif;
             overflow: hidden;
-            /* Verhindert Pull-to-refresh auf Mobile */
             overscroll-behavior-y: none;
         }
 
@@ -44,7 +43,6 @@
             overflow: hidden;
         }
 
-        /* Start Button Design */
         #start-overlay {
             position: absolute;
             top: 0; left: 0;
@@ -92,10 +90,9 @@
 
         #phone-static {
             width: auto;
-            height: 85dvh; /* Größere Darstellung auf Mobile */
+            height: 85dvh;
             max-width: 95vw;
             object-fit: contain;
-            /* Präziser Fokus auf die Linse */
             transform-origin: 43.1% 17.2%; 
             z-index: 10;
             opacity: 1;
@@ -239,7 +236,7 @@
         <section id="event" class="py-32 md:py-48 px-6 text-center">
             <div class="max-w-4xl mx-auto">
                 <h2 class="text-2xl md:text-5xl font-bold mb-6 md:mb-8 tracking-tight">Save the Date</h2>
-                <p class="text-gray-400 text-lg md:text-xl mb-10 md:mb-12">18. Februar 2026 | 18:30 Uhr | Livestream</p>
+                <p class="text-gray-400 text-lg md:text-xl mb-10 md:mb-12">18. Februar 2026 | 19:00 Uhr | Livestream</p>
                 <div class="w-16 md:w-24 h-1 bg-gradient-to-r from-blue-500 via-red-500 to-yellow-500 mx-auto rounded-full opacity-50"></div>
             </div>
         </section>
@@ -358,9 +355,8 @@
             const tl = gsap.timeline({ onComplete: finalizeIntro });
             tl.to("#loader-text", { opacity: 0, duration: 0.5 });
 
-            // ZOOM OPTIMIERUNG
             tl.to(phoneImg, { 
-                scale: isMobile ? 130 : 100, // Deutlich mehr Scale auf Mobile um die Kamerapille auszufüllen
+                scale: isMobile ? 130 : 100, 
                 duration: 4.8, 
                 ease: "power4.in" 
             }, "-=0.2");
@@ -431,12 +427,15 @@ Das erwartet dich in unserem Live-Stream:
 💡 Exklusive Insights: Alles, was du über das neue Device wissen musst.
 🚀 Entertainment für alle: Egal ob Tech-Profi oder einfach nur neugierig.
 
-Sichere dir jetzt deinen Platz!
+Dauer: ca. 45 Minuten.
 
 🔴🔴🔴 LIVESTREAM LINK: ${streamLink}`;
 
-            const startTime = "20260218T173000Z";
-            const endTime = "20260218T193000Z";
+            // UTC Zeiten: 19:00 MEZ (Winterzeit) ist 18:00 UTC
+            // Start: 19:00 MEZ = 18:00 UTC
+            // Ende: 19:45 MEZ = 18:45 UTC (Dauer 45 Min)
+            const startTime = "20260218T180000Z";
+            const endTime = "20260218T184500Z";
 
             if (isApple) {
                 const icsContent = [
