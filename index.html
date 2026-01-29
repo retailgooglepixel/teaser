@@ -75,6 +75,7 @@
             border: none;
             box-shadow: 0 0 50px rgba(129, 160, 244, 0.4);
             animation: shine 3s linear infinite, pulse 2s ease-in-out infinite;
+            z-index: 2001; /* Sicherstellen, dass der Button klickbar ist */
         }
 
         @keyframes pulse {
@@ -95,8 +96,12 @@
             height: 80dvh;
             max-width: 90vw;
             object-fit: contain;
-            /* FEINJUSTIERUNG: Fokus exakt auf die Kamerapille */
-            transform-origin: 50% 17.5%; 
+            
+            /* --- WICHTIGE ÄNDERUNG FÜR MOBILE --- */
+            /* Vorher: 50% 17.5% (Mitte) */
+            /* Jetzt: 43.1% (Exakt auf die Linse ausgerichtet wie beim Desktop) */
+            transform-origin: 43.1% 17.3%; 
+            
             z-index: 10;
             opacity: 1;
             will-change: transform, opacity;
@@ -127,6 +132,7 @@
             overflow-y: auto;
             background-color: #000;
             scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
         }
 
         .bg-glow {
@@ -253,7 +259,13 @@
         }
 
         function initExperience() {
-            if (isMobile) requestFullscreen();
+            // Auf Mobile erst Fullscreen anfordern (kann von Browsern blockiert werden ohne direkten Touch, hier aber okay durch Button Click)
+            if (isMobile) {
+                try {
+                    requestFullscreen();
+                } catch(e) { console.log("Fullscreen not allowed"); }
+            }
+            
             startOverlay.style.opacity = '0';
             setTimeout(() => {
                 startOverlay.style.display = 'none';
@@ -329,18 +341,22 @@
 
             tl.to("#loader-text", { opacity: 0, duration: 0.3 });
 
-            // MASSIVER ZOOM DURCH DIE LINSE
-            // Scale von 600x für extremen Fokus-Eintritt
+            // --- ANIMATIONSANPASSUNG FÜR MOBILE DIVE ---
+            // Scale leicht erhöht für Mobile (750x), damit wir sicher im "Schwarzen" landen, bevor das Bild endet
             tl.to(phoneImg, { 
-                scale: isMobile ? 600 : 120, 
+                scale: isMobile ? 750 : 120, 
                 duration: 5.5, 
                 ease: "power3.in" 
             });
 
-            tl.to(threeContainer, { opacity: 1, duration: 1.5 }, "-=1.8");
-            tl.to(phoneImg, { opacity: 0, duration: 0.5 }, "-=0.5");
+            // Timeline Adjust: Weltall erscheint früher, Phone bleibt einen Tick länger sichtbar
+            // damit keine weiße Lücke entsteht, sondern man in die "Schwärze" der Linse eintaucht
+            tl.to(threeContainer, { opacity: 1, duration: 2.0 }, "-=2.5");
+            
+            // Das Phone wird erst transparent, wenn wir schon sehr tief im Zoom sind
+            tl.to(phoneImg, { opacity: 0, duration: 0.8, ease: "power1.out" }, "-=0.8");
 
-            tl.to(camera.position, { z: -1200, duration: 11, ease: "power2.inOut" }, "-=1.5");
+            tl.to(camera.position, { z: -1200, duration: 11, ease: "power2.inOut" }, "-=2.0");
 
             floatingObjects.forEach((obj, index) => {
                 const startTime = index * 2.5 + 2;
