@@ -30,7 +30,6 @@
             overflow: hidden;
         }
 
-        /* Intro Animation Layout */
         #intro-wrapper {
             position: fixed;
             top: 0; left: 0;
@@ -65,7 +64,6 @@
             opacity: 0;
         }
 
-        /* Hauptinhalt der Webseite */
         #main-content {
             opacity: 0;
             visibility: hidden;
@@ -123,7 +121,6 @@
             font-weight: 600;
         }
 
-        /* Fluid Typography */
         .text-hero {
             font-size: clamp(2.5rem, 10vw, 10rem);
         }
@@ -134,38 +131,34 @@
 </head>
 <body>
 
-    <!-- Hintergrundmusik - Ohne Loop-Attribut, Button entfernt -->
-    <audio id="bg-music">
-        <source src="musik.mp3" type="audio/mpeg">
+    <!-- Hintergrundmusik - Ohne Loop-Attribut -->
+    <audio id="bg-music" preload="auto">
+        <source src="./musik.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- Intro Animation Container -->
     <div id="intro-wrapper">
         <img id="phone-static" src="https://i.postimg.cc/VkDfMc1n/image-global-P9a-2024Q3-24H077x008-B-IRIS-MASTER-SIMP-(1).png" alt="Mysteriöse Entdeckung">
         <div id="three-canvas-container"></div>
         <div id="loader-text">Wird vorbereitet...</div>
     </div>
 
-    <!-- Hauptinhalt -->
     <div id="main-content">
         <div class="bg-glow">
             <div class="glow-circle w-[400px] md:w-[800px] h-[400px] md:h-[800px] top-[-10%] left-[-10%]" style="background: var(--iris-color);"></div>
             <div class="glow-circle w-[350px] md:w-[700px] h-[350px] md:h-[700px] bottom-[-10%] right-[-10%]" style="background: var(--star-blue);"></div>
         </div>
 
-        <!-- Navigation -->
         <nav class="w-full py-6 md:py-10 px-6 md:px-12 flex justify-between md:justify-end items-center">
-            <div class="text-[10px] font-bold tracking-[0.2em] md:hidden">INNOVATION</div>
+            <div class="text-[10px] font-bold tracking-[0.2em] md:hidden text-white/40">INNOVATION</div>
             <div class="flex space-x-6 md:space-x-12 text-[10px] font-bold tracking-[0.5em] text-gray-500 uppercase">
                 <a href="#event" class="hover:text-white transition">Dabeisein</a>
                 <a href="#event" class="hover:text-white transition">18.02.26</a>
             </div>
         </nav>
 
-        <!-- Hero Section -->
         <section class="min-h-[90vh] flex flex-col justify-center items-center px-6 text-center">
             <div id="hero-reveal" class="w-full max-w-7xl mx-auto">
-                <span class="text-[10px] md:text-xs font-bold tracking-[0.6em] md:tracking-[0.8em] text-blue-500 mb-6 md:mb-8 block uppercase">Ein neuer Horizont</span>
+                <span class="text-[10px] md:text-xs font-bold tracking-[0.6em] md:tracking-[0.8em] text-blue-500 mb-6 md:mb-8 block uppercase text-blue-400">Ein neuer Horizont</span>
                 
                 <h1 class="text-hero font-bold tracking-tighter mb-4 md:mb-8 leading-none">
                     Verpasse nicht <br> <span class="gradient-text">den Augenblick...</span>
@@ -176,18 +169,17 @@
                 </p>
 
                 <div class="flex justify-center">
-                    <button onclick="handleCalendarClick()" class="magic-button">
+                    <button id="cta-btn" onclick="handleCalendarClick()" class="magic-button">
                         TERMIN SICHERN
                     </button>
                 </div>
             </div>
         </section>
 
-        <!-- Event Footer Section -->
         <section id="event" class="py-32 md:py-48 px-6 text-center">
             <div class="max-w-4xl mx-auto">
                 <h2 class="text-2xl md:text-5xl font-bold mb-6 md:mb-8 tracking-tight">Save the Date</h2>
-                <p class="text-gray-400 text-lg md:text-xl mb-10 md:mb-12">18. Februar 2026 | Livestream</p>
+                <p class="text-gray-400 text-lg md:text-xl mb-10 md:mb-12">18. Februar 2026 | 18:30 Uhr | Livestream</p>
                 <div class="w-16 md:w-24 h-1 bg-gradient-to-r from-blue-500 via-red-500 to-yellow-500 mx-auto rounded-full opacity-50"></div>
             </div>
         </section>
@@ -214,30 +206,34 @@
             'https://i.postimg.cc/vT1dPXKx/Google-Tensor-G4-1.jpg'
         ];
 
-        // Funktion zum Starten der 18-Sekunden-Musiksequenz
+        // Verbesserte Audio-Logik
         function playIntroMusic() {
             if (audioHasStarted) return;
+            
+            // Versuche den Audio-Kontext zu entsperren
             bgMusic.volume = 0;
             bgMusic.play().then(() => {
                 audioHasStarted = true;
                 gsap.to(bgMusic, { volume: 0.5, duration: 3 });
-                // STRENG NACH 18 SEKUNDEN STOPPEN
+                
+                // Stopp nach 18 Sekunden
                 setTimeout(() => {
                     gsap.to(bgMusic, { volume: 0, duration: 2, onComplete: () => {
                         bgMusic.pause();
+                        bgMusic.currentTime = 0;
                     }});
                 }, 18000);
             }).catch(e => {
-                // Autoplay blockiert: Warte auf erste Interaktion
-                const initOnInteraction = () => {
-                    playIntroMusic();
-                    window.removeEventListener('click', initOnInteraction);
-                    window.removeEventListener('touchstart', initOnInteraction);
-                };
-                window.addEventListener('click', initOnInteraction);
-                window.addEventListener('touchstart', initOnInteraction);
+                console.log("Audio wartet auf User-Interaktion...");
             });
         }
+
+        // Globaler Listener für die erste Interaktion, um Audio zu entsperren
+        ['click', 'touchstart', 'pointerdown', 'wheel'].forEach(evt => {
+            window.addEventListener(evt, () => {
+                if (!audioHasStarted) playIntroMusic();
+            }, { once: true });
+        });
 
         window.onload = () => {
             initSpaceScene();
@@ -320,7 +316,6 @@
         }
 
         function startExperience() {
-            // Musik automatisch anfordern
             playIntroMusic();
 
             const tl = gsap.timeline({ onComplete: finalizeIntro });
@@ -376,22 +371,51 @@
         }
 
         function handleCalendarClick() {
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-            const title = "LIVE: Ein magisches Event beginnt";
-            const desc = "Sei dabei: https://youtube.com/live/Lieiv2eLSrA?feature=share";
-            const start = "20260218T180000Z";
-            const end = "20260218T200000Z";
+            const isApple = /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent);
+            const title = "Google Pixel 10a Launch Event";
+            const streamLink = "https://youtube.com/live/Lieiv2eLSrA?feature=share";
+            
+            // Beschreibungstext
+            const description = "Sei live dabei, wenn das neue Google Pixel 10a angekündigt wird!\n\nUnsere Google-Experten versorgen dich sofort mit allen Details.\n\nDas erwartet dich in unserem Live-Stream:\n\n🎥 Live-Reaction: Erlebe die Enthüllung in Echtzeit.\n💡 Exklusive Insights: Alles, was du über das neue Device wissen musst.\n🚀 Entertainment für alle: Egal ob Tech-Profi oder einfach nur neugierig.\n\nSichere dir jetzt deinen Platz!\n\n🔴🔴🔴 LIVESTREAM LINK: " + streamLink;
 
-            if (isIOS) {
-                const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nDTSTART:${start}\nDTEND:${end}\nSUMMARY:${title}\nDESCRIPTION:${desc}\nEND:VEVENT\nEND:VCALENDAR`;
-                const blob = new Blob([ics], { type: 'text/calendar' });
-                const url = URL.createObjectURL(blob);
+            // Zeit-Parameter: 18:30 Uhr deutscher Zeit (UTC+1 im Feb) = 17:30 UTC
+            const startTime = "20260218T173000Z";
+            const endTime = "20260218T193000Z";
+
+            if (isApple) {
+                // Generiere .ics Datei für native Kalender-Apps
+                const icsContent = [
+                    "BEGIN:VCALENDAR",
+                    "VERSION:2.0",
+                    "PRODID:-//Innovation Labs//DE",
+                    "BEGIN:VEVENT",
+                    "UID:" + Date.now() + "@innovation-labs.de",
+                    "DTSTAMP:" + startTime,
+                    "DTSTART:" + startTime,
+                    "DTEND:" + endTime,
+                    "SUMMARY:" + title,
+                    "DESCRIPTION:" + description.replace(/\n/g, "\\n"),
+                    "LOCATION:YouTube Live",
+                    "END:VEVENT",
+                    "END:VCALENDAR"
+                ].join("\n");
+
+                const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+                const url = window.URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = 'event-1802.ics';
+                link.setAttribute('download', 'google-event.ics');
+                document.body.appendChild(link);
                 link.click();
+                document.body.removeChild(link);
             } else {
-                window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${start}/${end}&details=${encodeURIComponent(desc)}`, "_blank");
+                // Google Kalender Template für Browser/Android
+                const gCalUrl = "https://calendar.google.com/calendar/render?action=TEMPLATE" +
+                                "&text=" + encodeURIComponent(title) +
+                                "&dates=" + startTime + "/" + endTime +
+                                "&details=" + encodeURIComponent(description) +
+                                "&location=YouTube%20Live";
+                window.open(gCalUrl, "_blank");
             }
         }
 
