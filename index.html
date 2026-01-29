@@ -24,7 +24,6 @@
             --gradient-3: #d9e3dc;
         }
 
-        /* Verhindert Scrollen und nutzt dynamische Viewport-Höhe */
         body, html {
             margin: 0; padding: 0;
             width: 100%; height: 100dvh;
@@ -33,7 +32,7 @@
             font-family: 'Google Sans', 'Roboto', 'Inter', sans-serif;
             overflow: hidden;
             overscroll-behavior-y: none;
-            position: fixed; /* Verhindert das Springen der Browser-Leiste */
+            position: fixed;
         }
 
         #intro-wrapper {
@@ -75,7 +74,6 @@
             border: none;
             box-shadow: 0 0 50px rgba(129, 160, 244, 0.4);
             animation: shine 3s linear infinite, pulse 2s ease-in-out infinite;
-            pointer-events: auto;
         }
 
         @keyframes pulse {
@@ -90,19 +88,25 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #000;
         }
 
         #phone-static {
             width: auto;
-            height: 85dvh;
+            height: 82dvh;
             max-width: 95vw;
             object-fit: contain;
-            /* Präziser Fokus auf das Innere der Kamerapille für Mobile */
-            transform-origin: 43.2% 17.2%; 
+            /* Präziser Fokus auf die Mitte der Kamerapille für Mobile */
+            transform-origin: 43.5% 17.1%; 
             z-index: 10;
             opacity: 1;
             will-change: transform, opacity;
+        }
+
+        @media (min-width: 768px) {
+            #phone-static { 
+                height: 75vh;
+                transform-origin: 43.1% 17.2%; 
+            }
         }
 
         #three-canvas-container {
@@ -168,21 +172,18 @@
         <source src="./musik.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- Start-Button -->
     <div id="start-overlay">
         <button class="btn-start" onclick="initExperience()">Start</button>
     </div>
 
-    <!-- Intro mit optimiertem Zoom -->
     <div id="intro-wrapper">
         <div id="phone-container">
             <img id="phone-static" src="https://i.postimg.cc/VkDfMc1n/image-global-P9a-2024Q3-24H077x008-B-IRIS-MASTER-SIMP-(1).png" alt="Phone">
         </div>
         <div id="three-canvas-container"></div>
-        <div id="loader-text">Wird geladen...</div>
+        <div id="loader-text">Enthüllung wird vorbereitet...</div>
     </div>
 
-    <!-- Hauptseite -->
     <div id="main-content">
         <div class="bg-glow">
             <div class="glow-circle w-[500px] h-[500px] top-[-10%] left-[-10%]" style="background: var(--iris-color);"></div>
@@ -192,7 +193,7 @@
         <nav class="w-full py-8 px-8 flex justify-between items-center">
             <div class="text-[10px] font-bold tracking-[0.2em] text-white/40">INNOVATION</div>
             <div class="flex space-x-6 text-[10px] font-bold tracking-[0.3em] text-gray-400 uppercase">
-                <a href="#event">18.02.26</a>
+                <a href="#event" class="hover:text-white transition">18.02.26</a>
             </div>
         </nav>
 
@@ -235,18 +236,20 @@
 
         const isMobile = window.innerWidth < 768;
 
-        // Vollbild-Funktion für Android Chrome
+        const objectUrls = [
+            'https://i.postimg.cc/BbyJsRFK/Endcard-opt3-width-1300.png',
+            'https://i.postimg.cc/GtSmtHWr/google-pixel-buds-a-series-sea.png',
+            'https://i.postimg.cc/vT1dPXKx/Google-Tensor-G4-1.jpg'
+        ];
+
         function toggleFullScreen() {
             if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(err => {
-                    console.log(`Error attempting to enable full-screen mode: ${err.message}`);
-                });
+                document.documentElement.requestFullscreen().catch(() => {});
             }
         }
 
         function initExperience() {
             if (isMobile) toggleFullScreen();
-            
             startOverlay.style.opacity = '0';
             setTimeout(() => {
                 startOverlay.style.display = 'none';
@@ -269,7 +272,7 @@
 
         function initSpaceScene() {
             scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(isMobile ? 70 : 45, window.innerWidth / window.innerHeight, 0.1, 5000);
+            camera = new THREE.PerspectiveCamera(isMobile ? 75 : 45, window.innerWidth / window.innerHeight, 0.1, 5000);
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -280,18 +283,34 @@
             starGroup = new THREE.Group();
             const starGeometry = new THREE.BufferGeometry();
             const starVertices = [];
-            const starCount = isMobile ? 3000 : 8000;
+            const starCount = isMobile ? 4000 : 9000;
 
             for (let i = 0; i < starCount; i++) {
-                starVertices.push((Math.random()-0.5)*2000, (Math.random()-0.5)*2000, (Math.random()-0.5)*4000);
+                starVertices.push((Math.random()-0.5)*2500, (Math.random()-0.5)*2500, (Math.random()-0.5)*5000);
             }
             starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
-            const stars = new THREE.Points(starGeometry, new THREE.PointsMaterial({ size: 1.5, color: 0x81a0f4, transparent: true, opacity: 0.8 }));
+            const stars = new THREE.Points(starGeometry, new THREE.PointsMaterial({ size: 1.2, color: 0x81a0f4, transparent: true, opacity: 0.8 }));
             starGroup.add(stars);
             scene.add(starGroup);
 
             const loader = new THREE.TextureLoader();
             loader.setCrossOrigin('anonymous');
+
+            // Lade schwebende Objekte wieder ein
+            objectUrls.forEach((url, index) => {
+                loader.load(url, (tex) => {
+                    const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0 });
+                    const sprite = new THREE.Sprite(mat);
+                    let baseSize = isMobile ? 18 : 25;
+                    if (index === 0 || index === 2) baseSize = isMobile ? 30 : 45;
+                    sprite.scale.set(baseSize, baseSize * (tex.image.height / tex.image.width), 1);
+                    // Startposition weit hinten im All
+                    sprite.position.set((index % 2 === 0 ? 1.5 : -1.5) * (isMobile ? 25 : 40), (index === 1 ? -10 : 10), -1500);
+                    scene.add(sprite);
+                    floatingObjects.push(sprite);
+                });
+            });
+
             loader.load('https://i.postimg.cc/5Nr3VrfQ/Google-Gemini-icon-2025-svg.png', (tex) => {
                 const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
                 geminiSprite = new THREE.Sprite(mat);
@@ -306,60 +325,74 @@
 
         function startExperience() {
             playIntroMusic();
-            const tl = gsap.timeline({ 
-                onComplete: finalizeIntro 
-            });
+            const tl = gsap.timeline({ onComplete: finalizeIntro });
 
             tl.to("#loader-text", { opacity: 0, duration: 0.3 });
 
-            // MASSIVER ZOOM-EFFEKT
-            // Scale von 450x sorgt dafür, dass die schwarze Linse den Bildschirm füllt
+            // ZOOM DURCH DAS HANDY
+            // Scale von 500x sorgt dafür, dass die schwarze Pille den gesamten Screen füllt
             tl.to(phoneImg, { 
-                scale: isMobile ? 450 : 120, 
-                duration: 5, 
+                scale: isMobile ? 500 : 120, 
+                duration: 5.5, 
                 ease: "power3.in" 
             });
 
-            // Die Linse wird zum "Tor" - wir faden das Telefon erst spät aus
             tl.to(threeContainer, { 
                 opacity: 1, 
                 duration: 1.5 
-            }, "-=1.5");
+            }, "-=1.8");
 
             tl.to(phoneImg, { 
                 opacity: 0, 
                 duration: 0.5 
             }, "-=0.5");
 
+            // Flug durch das All
             tl.to(camera.position, { 
                 z: -1200, 
-                duration: 10, 
+                duration: 11, 
                 ease: "power2.inOut" 
             }, "-=1.5");
 
+            // Schwebende Objekte einfliegen lassen
+            floatingObjects.forEach((obj, index) => {
+                const startTime = index * 2.5 + 2;
+                tl.to(obj.material, { opacity: 1, duration: 1 }, `-=${11 - startTime}`);
+                tl.to(obj.position, { 
+                    x: (index % 2 === 0 ? -2.5 : 2.5) * (isMobile ? 30 : 50), 
+                    z: 600, 
+                    duration: 6, 
+                    ease: "none" 
+                }, `-=${11 - startTime}`);
+                tl.to(obj.material, { opacity: 0, duration: 1 }, `-=${11 - startTime - 5}`);
+            });
+
             tl.add(() => {
                 if(geminiSprite) {
-                    const s = isMobile ? 50 : 70;
-                    gsap.to(geminiSprite.scale, { x: s, y: s, duration: 4 });
+                    const s = isMobile ? 55 : 75;
+                    gsap.to(geminiSprite.scale, { x: s, y: s, duration: 4.5, ease: "power2.out" });
                 }
-            }, "-=4.5");
+            }, "-=5.0");
 
-            tl.to(introWrapper, { backgroundColor: "#fff", duration: 0.3 }, "-=0.3");
-            tl.to(introWrapper, { opacity: 0, duration: 0.8 });
+            tl.to(introWrapper, { backgroundColor: "#fff", duration: 0.4 }, "-=0.4");
+            tl.to(introWrapper, { opacity: 0, duration: 1 });
         }
 
         function animate() {
             requestAnimationFrame(animate);
             if (!renderer || !scene || !camera) return;
-            if(starGroup) starGroup.position.z += 4;
-            if(starGroup && starGroup.position.z > 1000) starGroup.position.z = 0;
+            if(starGroup) starGroup.position.z += 5;
+            if(starGroup && starGroup.position.z > 1500) starGroup.position.z = 0;
             if(geminiSprite) geminiSprite.material.rotation += 0.005;
+            floatingObjects.forEach((obj, i) => {
+                obj.material.rotation += (i % 2 === 0 ? 0.003 : -0.003);
+            });
             renderer.render(scene, camera);
         }
 
         function finalizeIntro() {
             introWrapper.style.display = 'none';
-            document.body.style.position = 'static'; // Erlaubt normales Scrolling wieder
+            document.body.style.position = 'static';
             document.body.style.overflowY = 'auto';
             const main = document.getElementById('main-content');
             main.style.opacity = '1';
@@ -370,8 +403,8 @@
         function handleCalendarClick() {
             const isApple = /iPhone|iPad|iPod/.test(navigator.userAgent);
             const title = "Google Pixel 10a Launch Event";
-            const desc = "Sei live dabei beim Launch des Pixel 10a! \nLink: https://youtube.com/live/Lieiv2eLSrA";
-            const start = "20260218T180000Z"; // 19 Uhr MEZ
+            const desc = "Sei live dabei beim Launch des Pixel 10a! Dauer ca. 45 Min. \nLink: https://youtube.com/live/Lieiv2eLSrA";
+            const start = "20260218T180000Z"; 
             const end = "20260218T184500Z";
 
             if (isApple) {
@@ -380,7 +413,7 @@
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = 'event.ics';
+                a.download = 'pixel-event.ics';
                 a.click();
             } else {
                 window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${start}/${end}&details=${encodeURIComponent(desc)}`, "_blank");
