@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <!-- Mobile Web App Tags für "Zum Home-Bildschirm hinzufügen" -->
+    <!-- Mobile Web App Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
@@ -34,7 +34,7 @@
             font-family: 'Google Sans', 'Roboto', 'Inter', sans-serif;
             overflow: hidden;
             overscroll-behavior-y: none;
-            position: fixed; /* Fixiert den Viewport gegen Browser-Leisten-Springen */
+            position: fixed;
         }
 
         #intro-wrapper {
@@ -75,7 +75,6 @@
             border: none;
             box-shadow: 0 0 50px rgba(129, 160, 244, 0.4);
             animation: shine 3s linear infinite, pulse 2s ease-in-out infinite;
-            z-index: 2001; /* Sicherstellen, dass der Button klickbar ist */
         }
 
         @keyframes pulse {
@@ -96,18 +95,13 @@
             height: 80dvh;
             max-width: 90vw;
             object-fit: contain;
-            
-            /* --- WICHTIGE ÄNDERUNG FÜR MOBILE --- */
-            /* Vorher: 50% 17.5% (Mitte) */
-            /* Jetzt: 43.1% (Exakt auf die Linse ausgerichtet wie beim Desktop) */
-            transform-origin: 43.1% 17.3%; 
-            
+            /* MOBILE FOKUS: Y-Achse weiter nach unten geschoben (ca. 20% tiefer als zuvor) */
+            transform-origin: 50% 18.6%; 
             z-index: 10;
             opacity: 1;
             will-change: transform, opacity;
         }
 
-        /* Desktop Anpassung */
         @media (min-width: 768px) {
             #phone-static { 
                 height: 75vh;
@@ -132,7 +126,6 @@
             overflow-y: auto;
             background-color: #000;
             scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
         }
 
         .bg-glow {
@@ -259,13 +252,7 @@
         }
 
         function initExperience() {
-            // Auf Mobile erst Fullscreen anfordern (kann von Browsern blockiert werden ohne direkten Touch, hier aber okay durch Button Click)
-            if (isMobile) {
-                try {
-                    requestFullscreen();
-                } catch(e) { console.log("Fullscreen not allowed"); }
-            }
-            
+            if (isMobile) requestFullscreen();
             startOverlay.style.opacity = '0';
             setTimeout(() => {
                 startOverlay.style.display = 'none';
@@ -341,22 +328,18 @@
 
             tl.to("#loader-text", { opacity: 0, duration: 0.3 });
 
-            // --- ANIMATIONSANPASSUNG FÜR MOBILE DIVE ---
-            // Scale leicht erhöht für Mobile (750x), damit wir sicher im "Schwarzen" landen, bevor das Bild endet
+            // MASSIVER ZOOM DURCH DIE LINSE
+            // Scale von 850x (statt 600) für noch tieferes Eindringen in das Schwarz
             tl.to(phoneImg, { 
-                scale: isMobile ? 750 : 120, 
-                duration: 5.5, 
+                scale: isMobile ? 850 : 120, 
+                duration: 5.8, 
                 ease: "power3.in" 
             });
 
-            // Timeline Adjust: Weltall erscheint früher, Phone bleibt einen Tick länger sichtbar
-            // damit keine weiße Lücke entsteht, sondern man in die "Schwärze" der Linse eintaucht
-            tl.to(threeContainer, { opacity: 1, duration: 2.0 }, "-=2.5");
-            
-            // Das Phone wird erst transparent, wenn wir schon sehr tief im Zoom sind
-            tl.to(phoneImg, { opacity: 0, duration: 0.8, ease: "power1.out" }, "-=0.8");
+            tl.to(threeContainer, { opacity: 1, duration: 1.5 }, "-=1.8");
+            tl.to(phoneImg, { opacity: 0, duration: 0.5 }, "-=0.5");
 
-            tl.to(camera.position, { z: -1200, duration: 11, ease: "power2.inOut" }, "-=2.0");
+            tl.to(camera.position, { z: -1200, duration: 11, ease: "power2.inOut" }, "-=1.5");
 
             floatingObjects.forEach((obj, index) => {
                 const startTime = index * 2.5 + 2;
@@ -414,7 +397,7 @@
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = 'event.ics';
+                a.download = 'pixel-event.ics';
                 a.click();
             } else {
                 window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${start}/${end}&details=${encodeURIComponent(desc)}`, "_blank");
