@@ -97,11 +97,11 @@
             max-width: 90vw;
             object-fit: contain;
             
-            /* --- KORREKTUR FÜR ZOOM-PUNKT --- */
-            /* X: 40% (etwas weiter links, um die Linsen zu treffen)
-               Y: 11.5% (deutlicher höher als vorher, um die Kamera-Bar zu treffen)
-            */
-            transform-origin: 40% 11.5%; 
+            /* --- FINALER KORREKTURWERT --- */
+            /* 11.5% war zu hoch (über Handy) */
+            /* 17.5% war zu tief (Rücken) */
+            /* Neuer Wert: 15.2% (Goldene Mitte der Kameraleiste) */
+            transform-origin: 43.1% 15.2%; 
             
             z-index: 10;
             opacity: 1;
@@ -336,14 +336,24 @@
             animate();
         }
 
+        // Hilfsfunktion, um Inhalt VOR dem Ausblenden des Wrappers sichtbar zu machen
+        function prepareContentReveal() {
+            document.body.style.position = 'static';
+            document.body.style.overflowY = 'auto';
+            const main = document.getElementById('main-content');
+            main.style.opacity = '1';
+            main.style.visibility = 'visible';
+            gsap.from("#hero-reveal", { y: 40, opacity: 0, duration: 1.5, ease: "power4.out" });
+        }
+
         function startExperience() {
             playIntroMusic();
-            const tl = gsap.timeline({ onComplete: finalizeIntro });
+            // Entferne onComplete:finalizeIntro, da wir dies nun in der Timeline präzise steuern
+            const tl = gsap.timeline();
 
             tl.to("#loader-text", { opacity: 0, duration: 0.3 });
 
-            // --- ANIMATIONSANPASSUNG FÜR MOBILE DIVE ---
-            // Scale massiv erhöht (1200), damit auch bei leichter Ungenauigkeit alles schwarz ist
+            // ZOOM
             tl.to(phoneImg, { 
                 scale: isMobile ? 1200 : 120, 
                 duration: 5.5, 
@@ -351,10 +361,7 @@
             });
 
             tl.to(threeContainer, { opacity: 1, duration: 2.0 }, "-=2.5");
-            
-            // Handy verschwindet erst GANZ spät, wenn der Zoom fast fertig ist
             tl.to(phoneImg, { opacity: 0, duration: 0.5, ease: "power1.out" }, "-=0.5");
-
             tl.to(camera.position, { z: -1200, duration: 11, ease: "power2.inOut" }, "-=2.0");
 
             floatingObjects.forEach((obj, index) => {
@@ -374,8 +381,18 @@
                 }
             }, "-=5.0");
 
+            // --- KORRIGIERTER ÜBERGANG ---
+            // 1. Wrapper wird weiß (Flash)
             tl.to(introWrapper, { backgroundColor: "#fff", duration: 0.4 }, "-=0.4");
+            
+            // 2. WÄHREND es weiß ist, wird der Content dahinter sichtbar gemacht (kein Flackern mehr)
+            tl.call(prepareContentReveal); 
+            
+            // 3. Weißer Wrapper blendet aus und enthüllt den Content
             tl.to(introWrapper, { opacity: 0, duration: 1 });
+            
+            // 4. Wrapper endgültig ausblenden
+            tl.set(introWrapper, { display: 'none' });
         }
 
         function animate() {
@@ -390,26 +407,11 @@
             renderer.render(scene, camera);
         }
 
-        function finalizeIntro() {
-            introWrapper.style.display = 'none';
-            document.body.style.position = 'static';
-            document.body.style.overflowY = 'auto';
-            const main = document.getElementById('main-content');
-            main.style.opacity = '1';
-            main.style.visibility = 'visible';
-            gsap.from("#hero-reveal", { y: 40, opacity: 0, duration: 1.5, ease: "power4.out" });
-        }
-
         function handleCalendarClick() {
             // Der bereitgestellte Kalender-Link für das Abonnement
             const calendarSubscriptionLink = "https://calendar.google.com/calendar/ical/c_46447c8f79376cdb8f28dd083b39a50be052005cf394c5b7caf0fc4a4d04b977%40group.calendar.google.com/public/basic.ics"; 
 
-            // Wir ändern das Protokoll von https:// zu webcal://
-            // Das signalisiert dem Betriebssystem (iOS, macOS, Windows, Android), dass es sich um ein Kalender-Abo handelt
-            // und öffnet direkt die Kalender-App.
             const webcalLink = calendarSubscriptionLink.replace(/^https?:/, "webcal:");
-            
-            // Öffnet den Link (löst auf dem Handy den App-Switch zur Kalender-App aus)
             window.location.href = webcalLink;
         }
 
