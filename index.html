@@ -295,9 +295,6 @@
             const starGeometry = new THREE.BufferGeometry();
             const starVertices = [];
             
-            // --- ÄNDERUNG: 20% mehr Sterne ---
-            // Mobile: 4000 -> 4800
-            // Desktop: 9000 -> 10800
             for (let i = 0; i < (isMobile ? 4800 : 10800); i++) {
                 starVertices.push((Math.random()-0.5)*2500, (Math.random()-0.5)*2500, (Math.random()-0.5)*5000);
             }
@@ -316,7 +313,6 @@
                     let baseSize = isMobile ? 18 : 25;
                     if (index === 0 || index === 2) baseSize = isMobile ? 30 : 45;
                     sprite.scale.set(baseSize, baseSize * (tex.image.height / tex.image.width), 1);
-                    // Initiale Position (Z weit hinten)
                     sprite.position.set((index % 2 === 0 ? 1.5 : -1.5) * (isMobile ? 25 : 40), (index === 1 ? -10 : 10), -1500);
                     scene.add(sprite);
                     floatingObjects.push(sprite);
@@ -364,27 +360,34 @@
                 const startTime = index * 2.5 + 2;
                 tl.to(obj.material, { opacity: 1, duration: 1 }, `-=${11 - startTime}`);
                 
-                // --- ÄNDERUNG: Objekte fliegen mittiger und langsamer ---
-                // Faktor von 2.5 auf 1.5 reduziert für weniger seitlichen Spread (mittiger)
-                // Duration von 6 auf 6.6 erhöht (10% langsamer)
                 tl.to(obj.position, { 
                     x: (index % 2 === 0 ? -1.5 : 1.5) * (isMobile ? 30 : 50), 
                     z: 600, duration: 6.6, ease: "none" 
                 }, `-=${11 - startTime}`);
                 
-                tl.to(obj.material, { opacity: 0, duration: 1 }, `-=${11 - startTime - 5.5}`); // Offset für Fadeout leicht angepasst wegen längerer Duration
+                tl.to(obj.material, { opacity: 0, duration: 1 }, `-=${11 - startTime - 5.5}`); 
             });
 
+            // Timing angepasst: Stern kommt etwas früher relativ zum Ende
             tl.add(() => {
                 if(geminiSprite) {
                     const s = isMobile ? 55 : 75;
+                    // Stern Scale etwas schneller
                     gsap.to(geminiSprite.scale, { x: s, y: s, duration: 4.5, ease: "power2.out" });
                 }
-            }, "-=5.0");
+            }, "-=5.5");
 
-            tl.to(introWrapper, { backgroundColor: "#fff", duration: 0.4 }, "-=0.4");
+            // Flash angepasst:
+            // Kommt schneller (0.2s)
+            tl.to(introWrapper, { backgroundColor: "#fff", duration: 0.2 }, "-=0.2");
+            
+            // Content wird vorbereitet
             tl.call(prepareContentReveal); 
-            tl.to(introWrapper, { opacity: 0, duration: 1 });
+            
+            // ÜBERGANG:
+            // Weißer Flash blendet SOFORT (0.1s) aus -> "Direkt die Hauptseite"
+            tl.to(introWrapper, { opacity: 0, duration: 0.1 });
+            
             tl.set(introWrapper, { display: 'none' });
         }
 
@@ -403,19 +406,16 @@
         function handleCalendarClick() {
             const calendarSubscriptionLink = "https://calendar.google.com/calendar/ical/c_46447c8f79376cdb8f28dd083b39a50be052005cf394c5b7caf0fc4a4d04b977%40group.calendar.google.com/public/basic.ics"; 
             
-            // --- ÄNDERUNG: User Agent Check für Button ---
-            // Prüfen ob iOS (iPhone, iPad, iPod)
             const isApple = /iPhone|iPad|iPod/.test(navigator.userAgent);
 
             if (isApple) {
-                // Auf iOS erzwingen wir webcal:// für die Abo-Abfrage
                 const webcalLink = calendarSubscriptionLink.replace(/^https?:/, "webcal:");
                 window.location.href = webcalLink;
             } else {
-                // Auf Android & Desktop nutzen wir den normalen HTTPS Link.
-                // Das führt zum Download der ICS Datei oder Öffnen in der Kalender App (je nach Einstellung),
-                // was zuverlässiger ist als webcal:// auf Android.
-                window.open(calendarSubscriptionLink, '_blank');
+                // Für Android/Desktop:
+                // Wenn hier 404 kommt -> Kalender ist nicht "Öffentlich" in den Google Settings!
+                // location.href erzwingt das Öffnen im aktuellen Fenster (besser für Downloads)
+                window.location.href = calendarSubscriptionLink;
             }
         }
 
