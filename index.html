@@ -404,17 +404,54 @@
         }
 
         function handleCalendarClick() {
-            const calendarSubscriptionLink = "https://calendar.google.com/calendar/ical/c_46447c8f79376cdb8f28dd083b39a50be052005cf394c5b7caf0fc4a4d04b977%40group.calendar.google.com/public/basic.ics"; 
-            
             const isApple = /iPhone|iPad|iPod/.test(navigator.userAgent);
 
             if (isApple) {
-                const webcalLink = calendarSubscriptionLink.replace(/^https?:/, "webcal:");
-                window.location.href = webcalLink;
+                // --- IOS FIX: Manueller Eintrag statt Google-Link ---
+                // Wir erstellen eine saubere .ics Datei ohne HTML-Tags direkt hier,
+                // damit es auf dem iPhone perfekt aussieht.
+                
+                const title = "Google Pixel 10a Launch Event";
+                // Hier der saubere Text ohne HTML-Tags
+                const desc = `Sei dabei, hier klicken: https://youtube.com/live/Lieiv2eLSrA
+
+Unsere Google-Experten versorgen dich sofort mit allen Details.
+Das erwartet dich in unserem Live-Stream:
+
+🎥 Live-Reaction: Erlebe die Enthüllung in Echtzeit.
+💡 Exklusive Insights: Alles, was du über das neue Device wissen musst.
+🚀 Entertainment für alle: Egal ob Tech-Profi oder einfach nur neugierig.
+
+Sichere dir jetzt deinen Platz!`;
+                
+                const start = "20260218T180000Z";
+                const end = "20260218T184500Z"; 
+                const location = "YouTube Live";
+
+                // Aufbau der ICS Datei
+                const icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Innovation Labs//Pixel Event//DE
+BEGIN:VEVENT
+UID:pixel-launch-2026-ios-fix@innovationlabs
+DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]+"Z"}
+DTSTART:${start}
+DTEND:${end}
+SUMMARY:${title}
+DESCRIPTION:${desc.replace(/\n/g, '\\n')}
+LOCATION:${location}
+URL:https://youtube.com/live/Lieiv2eLSrA
+END:VEVENT
+END:VCALENDAR`;
+
+                // Datei erstellen und öffnen (iPhone bietet dann "Hinzufügen" an)
+                const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                window.location.href = url;
+
             } else {
-                // Für Android/Desktop:
-                // Wenn hier 404 kommt -> Kalender ist nicht "Öffentlich" in den Google Settings!
-                // location.href erzwingt das Öffnen im aktuellen Fenster (besser für Downloads)
+                // --- ANDROID: Bleibt unverändert (Abo-Link) ---
+                const calendarSubscriptionLink = "https://calendar.google.com/calendar/ical/c_46447c8f79376cdb8f28dd083b39a50be052005cf394c5b7caf0fc4a4d04b977%40group.calendar.google.com/public/basic.ics"; 
                 window.location.href = calendarSubscriptionLink;
             }
         }
