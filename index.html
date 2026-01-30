@@ -92,17 +92,21 @@
         }
 
         #phone-static {
+            /* WICHTIGSTE ÄNDERUNG: */
+            /* Wir erlauben width/height: auto, aber begrenzen sie mit max-values. */
+            /* Das zwingt die HTML-Box, sich exakt um das sichtbare Bild zu legen (kein leerer Raum oben/unten). */
             width: auto;
-            height: 80dvh;
+            height: auto;
             max-width: 90vw;
-            object-fit: contain;
+            max-height: 80dvh;
             
-            /* --- FINALER FIX BASIEREND AUF SCREENSHOT --- */
-            /* 15.2% war im schwarzen Bereich oben. */
-            /* Wir müssen DEUTLICH tiefer (höhere Zahl), näher an den Desktop-Wert (17.2%) ran. */
-            /* Ich setze es auf 16.8%, knapp über dem Rücken, mitten in der Linse. */
-            /* X auf 42% korrigiert (leicht links für die linke Linse) */
-            transform-origin: 42% 16.8%; 
+            object-fit: contain;
+            display: block;
+
+            /* Da die Box nun "tight" am Bild anliegt, funktionieren die Desktop-Koordinaten auch hier perfekt */
+            /* X: 43.1% (Linke Linse / leicht links der Mitte) */
+            /* Y: 17.2% (Höhe der Kameraleiste) */
+            transform-origin: 43.1% 17.2%; 
             
             z-index: 10;
             opacity: 1;
@@ -112,8 +116,8 @@
         /* Desktop Anpassung */
         @media (min-width: 768px) {
             #phone-static { 
-                height: 75vh;
-                transform-origin: 43.1% 17.2%; 
+                max-height: 75vh;
+                /* transform-origin wird vererbt und passt jetzt überall */
             }
         }
 
