@@ -97,11 +97,12 @@
             max-width: 90vw;
             object-fit: contain;
             
-            /* --- FINALER KORREKTURWERT --- */
-            /* 11.5% war zu hoch (über Handy) */
-            /* 17.5% war zu tief (Rücken) */
-            /* Neuer Wert: 15.2% (Goldene Mitte der Kameraleiste) */
-            transform-origin: 43.1% 15.2%; 
+            /* --- FINALER FIX BASIEREND AUF SCREENSHOT --- */
+            /* 15.2% war im schwarzen Bereich oben. */
+            /* Wir müssen DEUTLICH tiefer (höhere Zahl), näher an den Desktop-Wert (17.2%) ran. */
+            /* Ich setze es auf 16.8%, knapp über dem Rücken, mitten in der Linse. */
+            /* X auf 42% korrigiert (leicht links für die linke Linse) */
+            transform-origin: 42% 16.8%; 
             
             z-index: 10;
             opacity: 1;
