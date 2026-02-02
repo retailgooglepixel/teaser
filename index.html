@@ -368,25 +368,28 @@
                 tl.to(obj.material, { opacity: 0, duration: 1 }, `-=${11 - startTime - 5.5}`); 
             });
 
-            // Timing angepasst: Stern kommt etwas früher relativ zum Ende
+            // WICHTIG: Label setzen, um Stern und Blitz perfekt zu synchronisieren
+            tl.addLabel("starStart", "-=5.5");
+
             tl.add(() => {
                 if(geminiSprite) {
-                    const s = isMobile ? 55 : 75;
-                    // Stern Scale etwas schneller
-                    gsap.to(geminiSprite.scale, { x: s, y: s, duration: 4.5, ease: "power2.out" });
+                    // Skalierung MASSIV erhöht (300/400), damit sicher ALLES weiß/bedeckt ist
+                    const s = isMobile ? 300 : 400; 
+                    // Kürzer und knackiger (4s), "in" Easing für den Explosions-Effekt
+                    gsap.to(geminiSprite.scale, { x: s, y: s, duration: 4.0, ease: "power2.in" });
                 }
-            }, "-=5.5");
+            }, "starStart");
 
-            // Flash angepasst:
-            // Kommt schneller (0.2s)
-            tl.to(introWrapper, { backgroundColor: "#fff", duration: 0.2 }, "-=0.2");
+            // Der weiße Blitz kommt jetzt FIX 2.5s nach Start des Sterns.
+            // Zu diesem Zeitpunkt ist der Stern schon riesig und füllt den Screen.
+            // Kein Weltall mehr möglich.
+            tl.to(introWrapper, { backgroundColor: "#fff", duration: 0.2 }, "starStart+=2.5");
             
-            // Content wird vorbereitet
-            tl.call(prepareContentReveal); 
+            // Content darunter vorbereiten
+            tl.call(prepareContentReveal, null, "starStart+=2.6"); 
             
-            // ÜBERGANG:
-            // Weißer Flash blendet SOFORT (0.1s) aus -> "Direkt die Hauptseite"
-            tl.to(introWrapper, { opacity: 0, duration: 0.1 });
+            // Weißblende wegnehmen
+            tl.to(introWrapper, { opacity: 0, duration: 0.5 }, "starStart+=2.7");
             
             tl.set(introWrapper, { display: 'none' });
         }
@@ -407,12 +410,8 @@
             const isApple = /iPhone|iPad|iPod/.test(navigator.userAgent);
 
             if (isApple) {
-                // --- IOS FIX: Manueller Eintrag statt Google-Link ---
-                // Wir erstellen eine saubere .ics Datei ohne HTML-Tags direkt hier,
-                // damit es auf dem iPhone perfekt aussieht.
-                
+                // --- IOS FIX ---
                 const title = "Google Pixel 10a Launch Event";
-                // Hier der saubere Text ohne HTML-Tags
                 const desc = `Sei dabei, hier klicken: https://youtube.com/live/Lieiv2eLSrA
 
 Unsere Google-Experten versorgen dich sofort mit allen Details.
@@ -428,7 +427,6 @@ Sichere dir jetzt deinen Platz!`;
                 const end = "20260218T184500Z"; 
                 const location = "YouTube Live";
 
-                // Aufbau der ICS Datei
                 const icsContent = `BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//Innovation Labs//Pixel Event//DE
@@ -444,13 +442,12 @@ URL:https://youtube.com/live/Lieiv2eLSrA
 END:VEVENT
 END:VCALENDAR`;
 
-                // Datei erstellen und öffnen (iPhone bietet dann "Hinzufügen" an)
                 const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
                 const url = URL.createObjectURL(blob);
                 window.location.href = url;
 
             } else {
-                // --- ANDROID: Bleibt unverändert (Abo-Link) ---
+                // --- ANDROID ---
                 const calendarSubscriptionLink = "https://calendar.google.com/calendar/ical/c_46447c8f79376cdb8f28dd083b39a50be052005cf394c5b7caf0fc4a4d04b977%40group.calendar.google.com/public/basic.ics"; 
                 window.location.href = calendarSubscriptionLink;
             }
