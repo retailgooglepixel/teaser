@@ -208,16 +208,22 @@
                 <h1 class="text-hero font-bold tracking-tighter mb-8">
                     Verpasse nicht <br> <span class="gradient-text">den Augenblick...</span>
                 </h1>
-                <p class="max-w-md mx-auto text-lg font-medium tracking-tight mb-12 text-gray-300">
-                    Computing neu definiert: <br> Mehr Möglichkeiten für alle.
-                </p>
+                
+                <!-- TEXT ENTFERNT: Computing neu definiert... -->
+
                 <button onclick="handleCalendarClick()" class="magic-button">
                     TERMIN SICHERN
                 </button>
+
+                <!-- Bild unter dem Button -->
+                <img src="https://i.postimg.cc/0QkGBfYc/Bildschirmfoto-2026-02-03-um-10-14-20.png" 
+                     alt="Event Preview" 
+                     class="mt-12 mx-auto w-full max-w-[300px] md:max-w-[500px] h-auto object-contain rounded-xl shadow-2xl opacity-90">
             </div>
         </section>
 
-        <section id="event" class="py-32 px-8 text-center">
+        <!-- Abstand nach oben (pt) verringert von py-32 auf pt-12, damit es näher am Bild ist -->
+        <section id="event" class="pt-12 pb-32 px-8 text-center">
             <h2 class="text-3xl font-bold mb-4 tracking-tight">Save the Date</h2>
             <p class="text-gray-400 text-lg mb-8">18. Februar 2026 | 19:00 Uhr | Livestream</p>
             <div class="w-20 h-1 bg-gradient-to-r from-blue-500 via-red-500 to-yellow-500 mx-auto rounded-full"></div>
@@ -313,7 +319,16 @@
                     let baseSize = isMobile ? 18 : 25;
                     if (index === 0 || index === 2) baseSize = isMobile ? 30 : 45;
                     sprite.scale.set(baseSize, baseSize * (tex.image.height / tex.image.width), 1);
+                    
+                    // Initiale Position (Z weit hinten)
                     sprite.position.set((index % 2 === 0 ? 1.5 : -1.5) * (isMobile ? 25 : 40), (index === 1 ? -10 : 10), -1500);
+
+                    // --- FIX: Tensor G4 (Index 2) um 180 Grad drehen ---
+                    // Damit die Schrift "G4" richtig herum ist und nicht auf dem Kopf steht
+                    if (index === 2) {
+                        sprite.material.rotation = Math.PI; 
+                    }
+
                     scene.add(sprite);
                     floatingObjects.push(sprite);
                 });
