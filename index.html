@@ -422,10 +422,16 @@
         }
 
         function handleCalendarClick() {
-            const isApple = /iPhone|iPad|iPod/.test(navigator.userAgent);
+            const ua = navigator.userAgent;
+            const isApple = /iPhone|iPad|iPod/.test(ua);
+            const isAndroid = /Android/.test(ua);
+
+            // Die Kalender-ID für die Web-Version (aus dem Link extrahiert und decodiert)
+            const calendarId = "c_46447c8f79376cdb8f28dd083b39a50be052005cf394c5b7caf0fc4a4d04b977@group.calendar.google.com";
+            const calendarIcsLink = "https://calendar.google.com/calendar/ical/c_46447c8f79376cdb8f28dd083b39a50be052005cf394c5b7caf0fc4a4d04b977%40group.calendar.google.com/public/basic.ics";
 
             if (isApple) {
-                // --- IOS FIX ---
+                // --- IOS: Interner Blob ---
                 const title = "Google Pixel 10a Launch Event";
                 const desc = `Sei dabei, hier klicken: https://youtube.com/live/Lieiv2eLSrA
 
@@ -461,10 +467,17 @@ END:VCALENDAR`;
                 const url = URL.createObjectURL(blob);
                 window.location.href = url;
 
+            } else if (isAndroid) {
+                // --- ANDROID: Direkter ICS Link ---
+                // location.href ist hier zuverlässiger als window.open
+                window.location.href = calendarIcsLink;
+
             } else {
-                // --- ANDROID ---
-                const calendarSubscriptionLink = "https://calendar.google.com/calendar/ical/c_46447c8f79376cdb8f28dd083b39a50be052005cf394c5b7caf0fc4a4d04b977%40group.calendar.google.com/public/basic.ics"; 
-                window.location.href = calendarSubscriptionLink;
+                // --- CHROMEBOOK / DESKTOP (Windows, Mac, Linux) ---
+                // Hier öffnen wir die Google Kalender Web-Oberfläche zum Abonnieren.
+                // Das verhindert Dateiformat-Fehler auf Chrome OS.
+                const webLink = `https://calendar.google.com/calendar/render?cid=${encodeURIComponent(calendarId)}`;
+                window.open(webLink, '_blank');
             }
         }
 
