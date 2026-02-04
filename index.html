@@ -15,6 +15,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <!-- YouTube IFrame API für den Sound -->
+    <script src="https://www.youtube.com/iframe_api"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     
     <style>
@@ -171,7 +173,6 @@
 
         .text-hero { font-size: clamp(2.5rem, 10vw, 8rem); line-height: 1.1; }
 
-        /* Video Container für Shorts (9:16) */
         .video-wrapper {
             position: relative;
             padding-bottom: 177.77%; /* 16/9 Ratio */
@@ -189,13 +190,21 @@
             width: 100%;
             height: 100%;
         }
+
+        /* Container für verstecktes Audio-Video */
+        #yt-audio-container {
+            position: absolute;
+            width: 1px; height: 1px;
+            opacity: 0; pointer-events: none;
+        }
     </style>
 </head>
 <body>
 
-    <audio id="bg-music" preload="auto">
-        <source src="./musik.mp3" type="audio/mpeg">
-    </audio>
+    <!-- Versteckter Player für Background Music -->
+    <div id="yt-audio-container">
+        <div id="player"></div>
+    </div>
 
     <div id="start-overlay">
         <button class="btn-start" onclick="initExperience()">Start</button>
@@ -220,7 +229,6 @@
             <div class="text-[10px] font-bold tracking-[0.3em] text-gray-400 uppercase">18.02.26</div>
         </nav>
 
-        <!-- 1. Banner Foto ganz nach oben -->
         <div class="w-full px-4 mb-8">
             <img src="https://i.postimg.cc/0QkGBfYc/Bildschirmfoto-2026-02-03-um-10-14-20.png" 
                  alt="Event Banner" 
@@ -229,7 +237,6 @@
 
         <section class="flex flex-col justify-center items-center px-8 text-center">
             <div id="hero-reveal">
-                <!-- 2. Text "Ein neuer Horizont" entfernt -->
                 <h1 class="text-hero font-bold tracking-tighter mb-8">
                     Verpasse nicht <br> <span class="gradient-text">den Augenblick...</span>
                 </h1>
@@ -238,12 +245,10 @@
                     TERMIN SICHERN
                 </button>
 
-                <!-- 4. Datum & Zeit unter dem Button, fett und mittelgroß -->
                 <p class="text-2xl md:text-3xl font-bold tracking-tight text-white mb-8">
                     18. Februar 2026 | 19:00 Uhr | Livestream
                 </p>
 
-                <!-- 6. Video unter dem Datum -->
                 <div class="video-wrapper">
                     <iframe src="https://www.youtube.com/embed/5PKjU_HA-eg" 
                             title="Pixel Event Preview" 
@@ -254,7 +259,6 @@
             </div>
         </section>
 
-        <!-- 5. Save the Date Headline entfernt, Section verkleinert -->
         <section id="event" class="pb-24 px-8 text-center">
             <div class="w-20 h-1 bg-gradient-to-r from-blue-500 via-red-500 to-yellow-500 mx-auto rounded-full"></div>
         </section>
@@ -267,12 +271,12 @@
     <script>
         let scene, camera, renderer, starGroup, geminiSprite;
         let floatingObjects = [];
+        let ytPlayer;
         let audioHasStarted = false;
         
         const phoneImg = document.getElementById('phone-static');
         const introWrapper = document.getElementById('intro-wrapper');
         const threeContainer = document.getElementById('three-canvas-container');
-        const bgMusic = document.getElementById('bg-music');
         const startOverlay = document.getElementById('start-overlay');
 
         const isMobile = window.innerWidth < 768;
@@ -282,6 +286,22 @@
             'https://i.postimg.cc/GtSmtHWr/google-pixel-buds-a-series-sea.png',
             'https://i.postimg.cc/vT1dPXKx/Google-Tensor-G4-1.jpg'
         ];
+
+        // YouTube Player initialisieren
+        function onYouTubeIframeAPIReady() {
+            ytPlayer = new YT.Player('player', {
+                height: '1',
+                width: '1',
+                videoId: '5PKjU_HA-eg',
+                playerVars: {
+                    'autoplay': 0,
+                    'controls': 0,
+                    'showinfo': 0,
+                    'rel': 0,
+                    'loop': 0
+                }
+            });
+        }
 
         function requestFullscreen() {
             const el = document.documentElement;
@@ -305,12 +325,10 @@
         }
 
         function playIntroMusic() {
-            if (audioHasStarted) return;
-            bgMusic.volume = 0;
-            bgMusic.play().then(() => {
-                audioHasStarted = true;
-                gsap.to(bgMusic, { volume: 0.5, duration: 2 });
-            }).catch(() => {});
+            if (audioHasStarted || !ytPlayer) return;
+            ytPlayer.setVolume(80);
+            ytPlayer.playVideo();
+            audioHasStarted = true;
         }
 
         window.onload = () => {
@@ -383,23 +401,28 @@
             playIntroMusic();
             const tl = gsap.timeline();
             tl.to("#loader-text", { opacity: 0, duration: 0.3 });
+            
+            // Telefon Zoom
             tl.to(phoneImg, { 
                 scale: isMobile ? 1200 : 120, 
                 duration: 5.5, 
                 ease: "power3.in" 
             });
+
             tl.to(threeContainer, { opacity: 1, duration: 2.0 }, "-=2.5");
             tl.to(phoneImg, { opacity: 0, duration: 0.5, ease: "power1.out" }, "-=0.5");
-            tl.to(camera.position, { z: -1200, duration: 11, ease: "power2.inOut" }, "-=2.0");
+            
+            // Flugdauer angepasst auf ca. 11.5s nach dem Telefonzoom -> Total ca. 15s
+            tl.to(camera.position, { z: -1200, duration: 11.5, ease: "power2.inOut" }, "-=2.0");
 
             floatingObjects.forEach((obj, index) => {
                 const startTime = index * 2.5 + 2;
-                tl.to(obj.material, { opacity: 1, duration: 1 }, `-=${11 - startTime}`);
+                tl.to(obj.material, { opacity: 1, duration: 1 }, `-=${11.5 - startTime}`);
                 tl.to(obj.position, { 
                     x: (index % 2 === 0 ? -1.5 : 1.5) * (isMobile ? 30 : 50), 
                     z: 600, duration: 6.6, ease: "none" 
-                }, `-=${11 - startTime}`);
-                tl.to(obj.material, { opacity: 0, duration: 1 }, `-=${11 - startTime - 5.5}`); 
+                }, `-=${11.5 - startTime}`);
+                tl.to(obj.material, { opacity: 0, duration: 1 }, `-=${11.5 - startTime - 5.5}`); 
             });
 
             tl.addLabel("starStart", "-=5.5");
@@ -410,10 +433,25 @@
                 }
             }, "starStart");
 
+            // --- Sound Fade Out Logik ---
+            let volumeProxy = { val: 80 };
+            tl.to(volumeProxy, { 
+                val: 0, 
+                duration: 2.0, 
+                ease: "power1.out",
+                onUpdate: () => {
+                    if(ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(volumeProxy.val);
+                }
+            }, "starStart+=2.0");
+
+            // Flash & Reveal
             tl.to(introWrapper, { backgroundColor: "#fff", duration: 0.2 }, "starStart+=2.5");
             tl.call(prepareContentReveal, null, "starStart+=2.6"); 
             tl.to(introWrapper, { opacity: 0, duration: 0.5 }, "starStart+=2.7");
             tl.set(introWrapper, { display: 'none' });
+            
+            // Video am Ende stoppen
+            tl.add(() => { if(ytPlayer) ytPlayer.stopVideo(); });
         }
 
         function animate() {
