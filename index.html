@@ -2,574 +2,790 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
-    <!-- Mobile Web App Tags für "Zum Home-Bildschirm hinzufügen" -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#000000">
-
-    <title>Ein magischer Augenblick erwartet dich</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Pixel 10a - Ultimate Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <!-- YouTube IFrame API für den Sound -->
-    <script src="https://www.youtube.com/iframe_api"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-    
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        :root {
-            --star-blue: #81a0f4; 
-            --iris-color: #A7A1C7;
-            --gradient-1: #81a0f4;
-            --gradient-2: #ff5661;
-            --gradient-3: #d9e3dc;
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .bg-kahoot-red { background-color: #e21b3c; }
+        .bg-kahoot-blue { background-color: #1368ce; }
+        .bg-kahoot-yellow { background-color: #d89e00; }
+        .bg-kahoot-green { background-color: #26890c; }
+        
+        /* Hintergrundbild Setup */
+        .bg-pixel-image {
+            background-image: url('https://i.postimg.cc/ZY7QWdfc/image-de-DE-P10a-2026Q1-TEASE-3840x2160.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        
+        /* Dunkles Overlay für Lesbarkeit */
+        .bg-overlay {
+            background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 100%);
         }
 
-        body, html {
-            margin: 0; padding: 0;
-            width: 100%; height: 100dvh;
-            background-color: #000;
-            color: #ffffff;
-            font-family: 'Google Sans', 'Roboto', 'Inter', sans-serif;
-            overflow: hidden;
-            overscroll-behavior-y: none;
-            position: fixed;
+        .bg-pixel-player { background-color: #ff5661; }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
-
-        #intro-wrapper {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100dvh;
-            z-index: 1000;
-            background: #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-
-        #start-overlay {
-            position: absolute;
-            top: 0; left: 0;
-            z-index: 2000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%; height: 100dvh;
-            background: #000;
-            transition: opacity 0.8s ease;
-        }
-
-        .btn-start {
-            background: linear-gradient(90deg, var(--gradient-1), var(--gradient-2), var(--gradient-3), var(--gradient-1));
-            background-size: 200% auto;
-            color: white;
-            padding: 1.25rem 3.5rem;
-            border-radius: 999px;
-            font-weight: 900;
-            font-size: clamp(1.2rem, 5vw, 1.5rem);
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
-            cursor: pointer;
-            border: none;
-            box-shadow: 0 0 50px rgba(129, 160, 244, 0.4);
-            animation: shine 3s linear infinite, pulse 2s ease-in-out infinite;
-            z-index: 2001;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        #phone-container {
-            position: relative;
-            width: 100%; height: 100dvh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #phone-static {
-            width: auto;
-            height: auto;
-            max-width: 90vw;
-            max-height: 80dvh;
-            object-fit: contain;
-            display: block;
-            transform-origin: 43.1% 17.2%; 
-            z-index: 10;
-            opacity: 1;
-            will-change: transform, opacity;
-        }
-
-        @media (min-width: 768px) {
-            #phone-static { 
-                max-height: 75vh;
-            }
-        }
-
-        #three-canvas-container {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100dvh;
-            z-index: 5;
+        
+        .podium-bar {
+            transform: translateY(100%); 
             opacity: 0;
-            pointer-events: none;
+            animation: slideUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding-bottom: 1rem;
         }
 
-        #main-content {
-            opacity: 0;
-            visibility: hidden;
-            height: 100dvh;
-            width: 100%;
-            overflow-y: auto;
-            background-color: #000;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-        }
+        .podium-1 { height: 320px; background: linear-gradient(to bottom, #ffd700, #b8860b); border-top: 6px solid #fef08a; animation-delay: 2.5s; }
+        .podium-2 { height: 240px; background: linear-gradient(to bottom, #c0c0c0, #808080); border-top: 6px solid #e2e8f0; animation-delay: 1.5s; }
+        .podium-3 { height: 160px; background: linear-gradient(to bottom, #cd7f32, #8b4513); border-top: 6px solid #fbbf24; animation-delay: 0.5s; }
+        
+        #qrcode-container { padding: 12px; background: white; border-radius: 1.5rem; display: inline-block; box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.3); }
+        #qrcode-container img { margin: 0 auto; }
 
-        .bg-glow {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1; overflow: hidden;
-        }
-
-        .glow-circle {
-            position: absolute; border-radius: 50%;
-            filter: blur(100px); opacity: 0.15;
-            animation: drift 25s infinite alternate ease-in-out;
-        }
-
-        @keyframes drift {
-            from { transform: translate(-10%, -10%) scale(1); }
-            to { transform: translate(20%, 20%) scale(1.2); }
-        }
-
-        .gradient-text {
-            background: linear-gradient(90deg, var(--gradient-1), var(--gradient-2), var(--gradient-3), var(--gradient-1));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-size: 200% auto;
-            animation: shine 5s linear infinite;
-        }
-
-        @keyframes shine { to { background-position: 200% center; } }
-
-        .magic-button {
-            position: relative; background: white; color: black;
-            padding: 1.25rem 2.5rem; border-radius: 99px;
-            font-weight: 700; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 0 30px rgba(129, 160, 244, 0.2);
-        }
-
-        #loader-text {
-            position: absolute; bottom: 40px; left: 0; width: 100%;
-            text-align: center; color: rgba(255,255,255,0.4);
-            font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
-        }
-
-        .text-hero { font-size: clamp(2.5rem, 10vw, 8rem); line-height: 1.1; }
-
-        .video-wrapper {
-            position: relative;
-            padding-bottom: 177.77%; /* 16/9 Ratio */
-            height: 0;
-            overflow: hidden;
-            max-width: 315px;
-            margin: 2rem auto;
-            border-radius: 1.5rem;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        }
-        .video-wrapper iframe {
-            position: absolute;
+        .video-overlay {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-        }
-
-        /* Container für verstecktes Audio-Video */
-        #yt-audio-container {
-            position: absolute;
-            width: 1px; height: 1px;
-            opacity: 0; pointer-events: none;
-        }
-
-        /* Modal Styles für Datenschutz */
-        #legal-modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 5000;
+            background: #000; 
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 1rem;
         }
-        #legal-modal.active {
-            display: flex;
+        
+        .leaderboard-entry {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .modal-content {
-            background: #111;
-            width: 100%;
-            max-width: 600px;
-            max-height: 80vh;
-            border-radius: 1.5rem;
-            border: 1px solid rgba(255,255,255,0.1);
-            overflow-y: auto;
-            padding: 2rem;
-            position: relative;
-            scrollbar-width: thin;
-            scrollbar-color: #333 #111;
+
+        @keyframes pulse-ring {
+            0% { transform: scale(1) translateX(-50%); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
+            70% { transform: scale(1.1) translateX(-45%); box-shadow: 0 0 0 15px rgba(255, 255, 255, 0); }
+            100% { transform: scale(1) translateX(-50%); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+        }
+        .timer-active {
+            animation: pulse-ring 1s infinite;
+            transform-origin: center;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .btn-pop {
+            animation: popIn 0.4s ease-out forwards;
+        }
+
+        @keyframes revealCorrect {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(74, 222, 128, 0.8); }
+            100% { transform: scale(1); box-shadow: 0 0 20px rgba(74, 222, 128, 0.6); }
+        }
+        .correct-highlight {
+            border-color: #4ade80 !important; 
+            border-width: 8px !important;
+            animation: revealCorrect 1s infinite;
+            z-index: 50;
+            opacity: 1 !important;
+        }
+        .dimmed-answer {
+            opacity: 0.3 !important;
+            transform: scale(0.95);
+            filter: grayscale(0.8);
         }
     </style>
 </head>
-<body>
-
-    <!-- Versteckter Player für Background Music -->
-    <div id="yt-audio-container">
-        <div id="player"></div>
-    </div>
-
-    <div id="start-overlay">
-        <button class="btn-start" onclick="initExperience()">Start</button>
-    </div>
-
-    <div id="intro-wrapper">
-        <div id="phone-container">
-            <img id="phone-static" src="https://i.postimg.cc/VkDfMc1n/image-global-P9a-2024Q3-24H077x008-B-IRIS-MASTER-SIMP-(1).png" alt="Phone">
-        </div>
-        <div id="three-canvas-container"></div>
-        <div id="loader-text">Wird vorbereitet...</div>
-    </div>
-
-    <!-- Modal für Datenschutz & Impressum -->
-    <div id="legal-modal">
-        <div class="modal-content text-left text-sm leading-relaxed text-gray-300">
-            <button onclick="toggleLegal()" class="absolute top-4 right-4 text-white text-2xl">&times;</button>
-            <h2 class="text-xl font-bold mb-6 text-white">Datenschutz & Impressum</h2>
-            
-            <p class="mb-4"><strong>Einwilligung:</strong> Ich bin damit einverstanden, dass meine von mir angegebenen personenbezogenen Daten (Name, Adresse, Email sowie Bild- und Videomaterial) zur Abwicklung des Google Belohnungssystems, d.h. die Dokumentation der Teilnahme an Produkttrainings, die Erfassung der gesammelten Punkte und die Auslieferung von Prämien, von der TMS Personal GmbH verarbeitet und genutzt werden dürfen. ¹</p>
-            
-            <p class="mb-4 text-xs italic">¹Name und Kontaktdaten des für die Verarbeitung Verantwortlichen<br>
-            Verantwortlicher im Sinne der EU Datenschutz-Grundverordnung (DSGVO) ist:<br>
-            TMS Personal GmbH, Hafenallee 57, 63067 Offenbach (im Folgenden als „wir“ bezeichnet)<br>
-            Tel.: 069 405 625 0 | E-Mail: info@tmsgmbh.de</p>
-
-            <h3 class="font-bold text-white mt-6 mb-2">Registrierung; Zwecke und Rechtsgrundlage</h3>
-            <p class="mb-4">Wir verarbeiten die personenbezogenen Daten unserer Kunden im Rahmen des Google Belohnungssystems, um die Teilnahme an Produkttrainings zu dokumentieren und die Versendung etwaiger Geschenke zu ermöglichen und aus den von Ihnen zur Verfügung gestellten Bildern und Videos Content für unsere digitale Trainingsplattform (GRT) zu erstellen. Zu den verarbeiteten Daten gehören Name, Adresse, E-Mail sowie Bild- und Videomaterial.</p>
-            <p class="mb-4">Die Verarbeitung erfolgt auf Grundlage des Art. 6 Abs. 1 lit. b DSGVO (Durchführung Bestellvorgänge) und c DSGVO (gesetzlich erforderliche Archivierung). Die von Ihnen gemachten Angaben sowie das Bild- und Videomaterial sind zur Durchführung des Belohnungssystems erforderlich.</p>
-
-            <h3 class="font-bold text-white mt-6 mb-2">Empfänger und Drittstaaten</h3>
-            <p class="mb-4">Empfänger von Daten sind Mitarbeiter innerhalb unseres Unternehmens, die diese zur Bearbeitung der genannten Zwecke benötigen. Die Daten offenbaren wir gegenüber Dritten nur im Rahmen der Auslieferung oder im Rahmen der gesetzlichen Erlaubnisse und Pflichten gegenüber Rechtsberatern und Behörden. Die Daten werden nur dann in Drittländern verarbeitet, wenn dies zur Vertragserfüllung erforderlich ist.</p>
-
-            <h3 class="font-bold text-white mt-6 mb-2">Speicherdauer</h3>
-            <p class="mb-4">Wir speichern Ihre personenbezogenen Daten nur so lange, wie dies zur Erreichung der hier genannten Zwecke oder zur Erfüllung unserer vertraglichen oder gesetzlichen Pflichten erforderlich ist. Die Löschung Ihrer Daten im Zusammenhang mit der Registrierung auf der Gewinnspiel Plattform erfolgt nach Ablauf gesetzlicher Gewährleistungspflichten. Die Erforderlichkeit der Aufbewahrung der Daten wird alle drei Jahre überprüft.</p>
-
-            <h3 class="font-bold text-white mt-6 mb-2">Ihre Rechte nach der DSGVO</h3>
-            <p class="mb-4">Sie haben das Recht auf Auskunft (Art. 15), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung der Verarbeitung (Art. 18) und Datenübertragbarkeit (Art. 20). Darüber hinaus haben Sie ein Beschwerderecht bei einer Datenschutzaufsichtsbehörde.</p>
-            <p class="mb-4">Soweit die Verarbeitung auf Grundlage von Art. 6 Abs. 1 Buchstabe f DSGVO erfolgt, haben Sie das Recht auf Widerspruch (Art. 21). Eine erteilte Einwilligung können Sie jederzeit mit Wirkung für die Zukunft widerrufen.</p>
-
-            <h3 class="font-bold text-white mt-6 mb-2">Datenschutzbeauftragter</h3>
-            <p class="mb-6">Herr Rechtsanwalt Stefan Hohl<br>
-            Brunnenstraße 23, 63477 Maintal<br>
-            info@h-kanzlei.de</p>
-
-            <button onclick="toggleLegal()" class="w-full bg-white text-black py-3 rounded-full font-bold">Schließen</button>
-        </div>
-    </div>
-
-    <div id="main-content">
-        <div class="bg-glow">
-            <div class="glow-circle w-[500px] h-[500px] top-[-10%] left-[-10%]" style="background: var(--iris-color);"></div>
-            <div class="glow-circle w-[400px] h-[400px] bottom-[-10%] right-[-10%]" style="background: var(--star-blue);"></div>
-        </div>
-
-        <nav class="w-full py-8 px-8 flex justify-center items-center">
-            <!-- INNOVATION TEXT ENTFERNT -->
-            <div class="text-[10px] font-bold tracking-[0.3em] text-gray-400 uppercase">18.02.26</div>
-        </nav>
-
-        <div class="w-full px-4 mb-8">
-            <img src="https://i.postimg.cc/0QkGBfYc/Bildschirmfoto-2026-02-03-um-10-14-20.png" 
-                 alt="Event Banner" 
-                 class="mx-auto w-full max-w-[600px] h-auto object-contain rounded-2xl shadow-2xl opacity-90 border border-white/10">
-        </div>
-
-        <section class="flex flex-col justify-center items-center px-8 text-center">
-            <div id="hero-reveal">
-                <h1 class="text-hero font-bold tracking-tighter mb-8">
-                    Verpasse nicht <br> <span class="gradient-text">den Augenblick...</span>
-                </h1>
-                
-                <button onclick="handleCalendarClick()" class="magic-button mb-8">
-                    TERMIN SICHERN
-                </button>
-
-                <p class="text-2xl md:text-3xl font-bold tracking-tight text-white mb-8">
-                    18. Februar 2026 | 19:00 Uhr | Livestream
-                </p>
-
-                <div class="video-wrapper">
-                    <iframe src="https://www.youtube.com/embed/5PKjU_HA-eg" 
-                            title="Pixel Event Preview" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                            allowfullscreen></iframe>
-                </div>
-            </div>
-        </section>
-
-        <section id="event" class="pb-12 px-8 text-center">
-            <div class="w-20 h-1 bg-gradient-to-r from-blue-500 via-red-500 to-yellow-500 mx-auto rounded-full"></div>
-        </section>
-
-        <footer class="py-12 border-t border-white/5 text-center flex flex-col items-center">
-            <!-- INNOVATION LABS TEXT ENTFERNT -->
-            <button onclick="toggleLegal()" class="text-[10px] tracking-[0.3em] text-gray-500 hover:text-gray-300 transition-colors uppercase">
-                Datenschutz & Impressum
-            </button>
-        </footer>
-    </div>
+<body class="text-white min-h-screen">
 
     <script>
-        let scene, camera, renderer, starGroup, geminiSprite;
-        let floatingObjects = [];
-        let ytPlayer;
-        let audioHasStarted = false;
+        const myFirebaseConfig = {
+            apiKey: "AIzaSyD7fZDUszAY0kmwmV6QbhqCCmQVBbF7hqw",
+            authDomain: "quiz-stallion.firebaseapp.com",
+            projectId: "quiz-stallion",
+            storageBucket: "quiz-stallion.firebasestorage.app",
+            messagingSenderId: "932417713855",
+            appId: "1:932417713855:web:1a2afd95b5484cfd82b80a",
+            measurementId: "G-SN6Q2XRHNR"
+        };
+    </script>
+
+    <div id="app" class="min-h-screen bg-pixel-image">
+        <div class="min-h-screen w-full bg-overlay"> <!-- Overlay Wrapper -->
+
+            <!-- Intro Video Section -->
+            <div id="screen-intro" class="video-overlay hidden">
+                <div class="relative w-full h-full max-w-sm md:max-w-6xl max-h-[85vh] bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/20 flex flex-col items-center justify-center">
+                    <iframe 
+                        id="intro-video-iframe"
+                        class="w-full h-full"
+                        src="" 
+                        title="Intro Video"
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                        referrerpolicy="strict-origin-when-cross-origin" 
+                        allowfullscreen>
+                    </iframe>
+                </div>
+                <div class="mt-6 flex flex-col items-center gap-2">
+                    <button id="btn-skip-intro" class="bg-white/20 hover:bg-white/30 text-white px-8 py-4 rounded-full backdrop-blur-md font-black uppercase tracking-widest text-sm border border-white/20 transition-all shadow-lg hover:scale-105 active:scale-95">
+                        Intro überspringen / Start
+                    </button>
+                </div>
+            </div>
+
+            <!-- Connection Status -->
+            <div id="conn-status" class="fixed top-4 right-4 z-[100] px-3 py-1 bg-black/50 rounded-full text-[10px] uppercase font-bold text-yellow-500 border border-yellow-500/30">
+                Initialisierung...
+            </div>
+
+            <!-- Role Selection -->
+            <div id="screen-role" class="flex flex-col items-center justify-center min-h-screen p-6 text-center">
+                <h1 class="text-5xl md:text-8xl font-black mb-16 text-white drop-shadow-2xl italic uppercase tracking-tighter">Quiz Pixel 10a</h1>
+                
+                <div class="flex justify-center w-full">
+                    <!-- Admin Button - Glassmorphism -->
+                    <button id="btn-choice-admin" class="flex flex-col items-center p-12 bg-white/10 backdrop-blur-xl rounded-[2.5rem] border border-white/30 hover:bg-white/20 hover:border-white hover:scale-105 transition-all group shadow-2xl w-full max-w-md">
+                        <div class="bg-white/20 p-6 rounded-full mb-6 group-hover:bg-white/30 transition-colors">
+                            <i data-lucide="monitor" class="w-16 h-16 text-white group-hover:scale-110 transition-transform"></i>
+                        </div>
+                        <span class="text-3xl font-black uppercase tracking-tight text-white drop-shadow-md">Admin</span>
+                    </button>
+                    
+                    <button id="btn-choice-player" class="hidden"></button>
+                </div>
+            </div>
+
+            <!-- Admin View -->
+            <div id="screen-admin" class="hidden min-h-screen p-4 md:p-8 flex flex-col">
+                <header class="flex justify-between items-center mb-8">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-white/10 p-2 rounded-lg shadow-lg backdrop-blur-md border border-white/10"><i data-lucide="trophy" class="text-white"></i></div>
+                        <h2 class="text-2xl font-black uppercase italic tracking-tighter text-white drop-shadow-md">Pixel 10a Control</h2>
+                    </div>
+                    <div class="flex gap-4">
+                        <button id="btn-admin-reset" class="px-4 py-2 bg-white/10 backdrop-blur-md rounded-lg text-xs font-bold uppercase border border-white/20 hover:bg-white/20 transition-all shadow-lg text-white">Reset Scores</button>
+                        <button id="btn-admin-stop" class="px-4 py-2 bg-red-600/80 text-white rounded-lg text-xs font-bold uppercase border border-red-400 hover:bg-red-600 transition-all shadow-lg backdrop-blur-md">Beenden & Löschen</button>
+                    </div>
+                </header>
+
+                <div id="admin-content" class="flex-1 flex flex-col items-center justify-center w-full">
+                    <!-- Lobby -->
+                    <div id="admin-lobby" class="hidden text-center w-full max-w-5xl bg-white/10 p-8 md:p-12 rounded-[3rem] border border-white/20 shadow-2xl backdrop-blur-xl">
+                        <h3 class="text-4xl font-black mb-10 text-white uppercase italic tracking-tighter drop-shadow-md">Pixel 10a Challenge Lobby</h3>
+                        <div class="flex flex-col md:flex-row items-center justify-center gap-12">
+                            <div class="text-center space-y-4">
+                                <div id="qrcode-container"></div>
+                                <p id="display-url" class="text-[10px] font-mono text-white/80 break-all max-w-[220px] mx-auto"></p>
+                            </div>
+                            <div class="flex flex-col items-start gap-4 flex-1">
+                                <div class="bg-black/30 px-8 py-6 rounded-3xl border border-white/10 w-full shadow-inner flex items-center gap-6 backdrop-blur-sm">
+                                    <i data-lucide="users" class="w-10 h-10 text-white/80"></i>
+                                    <div>
+                                        <span class="text-5xl font-black block text-white" id="player-count">0</span>
+                                        <span class="text-xs uppercase text-white/60 font-black tracking-widest">Spieler online</span>
+                                    </div>
+                                </div>
+                                <div id="player-list" class="flex flex-wrap gap-2 mt-2 min-h-[60px] w-full bg-black/20 p-4 rounded-2xl border border-white/5 backdrop-blur-sm"></div>
+                                <button id="btn-admin-start" class="mt-4 w-full bg-white text-slate-900 hover:bg-slate-100 py-6 rounded-2xl text-3xl font-black shadow-xl hover:scale-105 active:scale-95 transition-all uppercase disabled:opacity-50 disabled:cursor-not-allowed tracking-tighter">Spiel Starten</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question -->
+                    <div id="admin-question" class="hidden w-full max-w-6xl space-y-8 relative">
+                        <div class="absolute -top-16 right-0 bg-white/10 backdrop-blur-xl text-white px-6 py-3 rounded-2xl font-black flex items-center gap-6 shadow-lg border border-white/20">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="user-check"></i>
+                                <span id="admin-answer-count" class="text-xl">0 / 0</span>
+                            </div>
+                            <div class="flex items-center gap-2 border-l border-white/30 pl-6">
+                                <i data-lucide="timer"></i>
+                                <span id="admin-timer" class="text-xl w-8 text-center">15</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white text-slate-900 p-12 rounded-[2.5rem] shadow-2xl text-center relative border-b-8 border-slate-200">
+                            <div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-purple-600 text-white px-10 py-3 rounded-full font-black shadow-xl">
+                                FRAGE <span id="q-number">1</span> / <span id="q-total">4</span>
+                            </div>
+                            <h2 id="q-text" class="text-4xl md:text-5xl font-black pt-4 italic"></h2>
+                        </div>
+                        <div id="q-options" class="grid grid-cols-1 md:grid-cols-2 gap-6 h-64"></div>
+                        <div class="flex justify-center opacity-50 hover:opacity-100 transition-opacity">
+                            <button id="btn-admin-force-reveal" class="bg-white/10 text-white px-8 py-3 rounded-xl font-bold text-sm hover:bg-white/20 flex items-center gap-2 border border-white/20 backdrop-blur-md">
+                                Sofort Auflösen <i data-lucide="skip-forward"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Leaderboard (Top 5) -->
+                    <div id="admin-results" class="hidden w-full max-w-3xl bg-white/10 p-10 rounded-[3rem] border border-white/20 backdrop-blur-xl shadow-2xl">
+                        <h2 class="text-4xl font-black mb-10 text-center italic uppercase tracking-widest text-white drop-shadow-md">Top 5 Leaderboard</h2>
+                        <div id="leaderboard-list" class="space-y-4"></div>
+                        <div class="flex justify-center mt-12">
+                            <button id="btn-admin-next" class="bg-white text-slate-900 hover:bg-slate-100 px-12 py-5 rounded-2xl font-black text-2xl hover:scale-105 transition-all shadow-xl uppercase">Nächste Frage</button>
+                        </div>
+                    </div>
+
+                    <!-- Podium -->
+                    <div id="admin-podium" class="hidden w-full max-w-6xl text-center">
+                        <h1 class="text-7xl font-black mb-10 text-white drop-shadow-lg uppercase italic">Das Finale</h1>
+                        <div class="flex items-end justify-center gap-4 md:gap-16 h-96 mb-20" id="podium-display"></div>
+                        
+                        <div class="flex justify-center gap-4 mt-20">
+                            <!-- CSV Download Button -->
+                            <button id="btn-admin-export" class="px-10 py-4 bg-green-600 border border-green-400 rounded-2xl hover:bg-green-500 transition-all font-bold uppercase text-xs text-white shadow-lg flex items-center gap-2">
+                                <i data-lucide="download"></i> Ergebnisse als Tabelle laden
+                            </button>
+                            <button onclick="location.reload()" class="px-10 py-4 bg-white/20 border border-white/40 rounded-2xl hover:bg-white/30 transition-all font-bold uppercase text-xs text-white shadow-lg backdrop-blur-md">
+                                Beenden
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Player View (Hat eigenen Hintergrund, überlagert das Bild) -->
+            <div id="screen-player" class="hidden fixed inset-0 z-[500] bg-pixel-player flex flex-col items-center justify-center p-6 transition-colors duration-500">
+                <div id="player-timer-container" class="hidden fixed top-6 left-1/2 -translate-x-1/2 bg-white/20 backdrop-blur rounded-full w-20 h-20 flex items-center justify-center font-black text-white text-3xl border-4 border-white/30 z-[600] timer-active shadow-xl">
+                    <span id="player-timer">15</span>
+                </div>
+
+                <div id="player-login" class="w-full max-w-sm text-center">
+                    <h1 class="text-4xl font-black mb-8 italic uppercase text-white tracking-tighter">Pixel 10a Player</h1>
+                    <div class="bg-white/10 p-8 rounded-[2.5rem] backdrop-blur-md border-2 border-white/20 shadow-2xl">
+                        <input id="player-name-input" type="text" placeholder="Dein Name" class="w-full bg-white text-slate-900 px-6 py-4 rounded-2xl font-bold text-lg mb-6 focus:outline-none ring-slate-400 focus:ring-4 transition-all" maxLength="12">
+                        <button id="btn-player-join" class="w-full bg-slate-900 text-white py-6 rounded-2xl text-2xl font-black shadow-xl active:scale-95 transition-all uppercase">Spiel beitreten</button>
+                    </div>
+                </div>
+
+                <div id="player-wait" class="hidden text-center animate-in fade-in duration-300">
+                    <div class="animate-bounce mb-8 inline-block"><i data-lucide="users" class="w-24 h-24 text-white"></i></div>
+                    <h2 class="text-4xl font-black uppercase italic">Du bist dabei!</h2>
+                    <p id="player-wait-msg" class="text-white mt-6 text-4xl font-black uppercase italic tracking-tight leading-tight drop-shadow-lg">Schau rüber zum Bildschirm!</p>
+                </div>
+
+                <div id="player-game" class="hidden w-full h-full flex flex-col gap-4 fixed inset-0 p-4 bg-slate-950 z-[100] justify-center pt-24">
+                    <div class="grid grid-cols-1 grid-rows-4 gap-4 flex-1">
+                        <button id="btn-ans-0" class="btn-pop bg-kahoot-red p-4 rounded-3xl shadow-xl flex items-center justify-center text-white active:scale-95 transition-all border-b-8 border-black/20 group relative overflow-hidden" style="animation-delay: 0.1s">
+                            <span class="absolute left-6 text-4xl opacity-50 group-hover:scale-110 transition-transform">▲</span>
+                            <span id="player-opt-0" class="text-lg md:text-2xl font-bold text-center leading-tight max-w-[80%]">Option 1</span>
+                        </button>
+                        <button id="btn-ans-1" class="btn-pop bg-kahoot-blue p-4 rounded-3xl shadow-xl flex items-center justify-center text-white active:scale-95 transition-all border-b-8 border-black/20 group relative overflow-hidden" style="animation-delay: 0.2s">
+                            <span class="absolute left-6 text-4xl opacity-50 group-hover:scale-110 transition-transform">◆</span>
+                            <span id="player-opt-1" class="text-lg md:text-2xl font-bold text-center leading-tight max-w-[80%]">Option 2</span>
+                        </button>
+                        <button id="btn-ans-2" class="btn-pop bg-kahoot-yellow p-4 rounded-3xl shadow-xl flex items-center justify-center text-white active:scale-95 transition-all border-b-8 border-black/20 group relative overflow-hidden" style="animation-delay: 0.3s">
+                            <span class="absolute left-6 text-4xl opacity-50 group-hover:scale-110 transition-transform">●</span>
+                            <span id="player-opt-2" class="text-lg md:text-2xl font-bold text-center leading-tight max-w-[80%]">Option 3</span>
+                        </button>
+                        <button id="btn-ans-3" class="btn-pop bg-kahoot-green p-4 rounded-3xl shadow-xl flex items-center justify-center text-white active:scale-95 transition-all border-b-8 border-black/20 group relative overflow-hidden" style="animation-delay: 0.4s">
+                            <span class="absolute left-6 text-4xl opacity-50 group-hover:scale-110 transition-transform">■</span>
+                            <span id="player-opt-3" class="text-lg md:text-2xl font-bold text-center leading-tight max-w-[80%]">Option 4</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="player-local-feedback" class="hidden fixed inset-0 flex flex-col items-center justify-center p-8 z-[200] bg-pixel-player animate-in zoom-in duration-300">
+                    <div id="local-feedback-card" class="w-full max-w-sm p-12 rounded-[3.5rem] text-center shadow-2xl">
+                        <div id="local-feedback-icon" class="mb-6 mx-auto"></div>
+                        <h2 id="local-feedback-title" class="text-5xl font-black mb-4 uppercase"></h2>
+                        <p id="local-feedback-points" class="text-3xl font-bold uppercase tracking-widest"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Alert -->
+    <div id="error-alert" class="hidden fixed bottom-4 left-4 right-4 bg-red-600 text-white p-4 rounded-xl z-[200] flex justify-between items-center shadow-2xl">
+        <span id="error-msg"></span>
+        <button onclick="document.getElementById('error-alert').classList.add('hidden')" class="bg-white/20 p-1 rounded px-3">Ok</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, onSnapshot, updateDoc, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // Firebase Setup
+        const app = initializeApp(myFirebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
         
-        const phoneImg = document.getElementById('phone-static');
-        const introWrapper = document.getElementById('intro-wrapper');
-        const threeContainer = document.getElementById('three-canvas-container');
-        const startOverlay = document.getElementById('start-overlay');
-        const legalModal = document.getElementById('legal-modal');
+        const appId = 'pixel10a-v20-final'; 
+        const gameDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'gameSession', 'mainState');
+        const playersColRef = collection(db, 'artifacts', appId, 'public', 'data', 'players');
 
-        const isMobile = window.innerWidth < 768;
-
-        const objectUrls = [
-            'https://i.postimg.cc/BbyJsRFK/Endcard-opt3-width-1300.png',
-            'https://i.postimg.cc/GtSmtHWr/google-pixel-buds-a-series-sea.png',
-            'https://i.postimg.cc/vT1dPXKx/Google-Tensor-G4-1.jpg'
+        const QUIZ_DATA = [
+            {
+                q: "Welches Tool hilft der Kundin am meisten beim Multitasking am Pixel 10a?",
+                options: ["Assistant", "Gemini", "Screenshots", "Nano"],
+                correct: 1, 
+                feedback: "Korrekt! Gemini ist der primäre KI-Assistent."
+            },
+            {
+                q: "Welche Softwarezusage gibt Google für das Pixel 10a?",
+                options: ["3 Jahre", "5 Jahre", "7 Jahre", "4 Jahre"],
+                correct: 2,
+                feedback: "Richtig! 7 Jahre Support garantiert."
+            },
+            {
+                q: "Beste Bildqualität bei Nacht?",
+                options: ["Action", "Nachtsicht", "Panorama", "Porträt"],
+                correct: 1,
+                feedback: "Ganz genau, Nachtsicht-Modus!"
+            },
+            {
+                q: "Wie viele Jahre Sicherheitsupdates erhält die Pixel 10 Serie?",
+                options: ["5", "7", "10", "Unbegrenzt"],
+                correct: 1,
+                feedback: "Korrekt, 7 Jahre!"
+            }
         ];
 
-        function toggleLegal() {
-            legalModal.classList.toggle('active');
-            if(legalModal.classList.contains('active')) {
-                document.body.style.overflow = 'hidden';
-            } else {
-                document.body.style.overflow = '';
-            }
+        let currentUser = null;
+        let players = [];
+        let gameState = {};
+        let myRole = null;
+        let timerInterval = null;
+        let showLocalFeedback = false; 
+        let isRevealing = false; 
+
+        lucide.createIcons();
+
+        function showError(msg) {
+            console.error(msg);
+            const alert = document.getElementById('error-alert');
+            const msgEl = document.getElementById('error-msg');
+            msgEl.innerText = msg;
+            alert.classList.remove('hidden');
         }
 
-        // YouTube Player initialisieren
-        function onYouTubeIframeAPIReady() {
-            ytPlayer = new YT.Player('player', {
-                height: '1',
-                width: '1',
-                videoId: '5PKjU_HA-eg',
-                playerVars: {
-                    'autoplay': 0,
-                    'controls': 0,
-                    'showinfo': 0,
-                    'rel': 0,
-                    'loop': 0
+        const urlParams = new URLSearchParams(window.location.search);
+        const autoRole = urlParams.get('role');
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                const statusEl = document.getElementById('conn-status');
+                statusEl.innerText = 'Online';
+                statusEl.className = 'fixed top-4 right-4 z-[100] px-3 py-1 bg-black/50 rounded-full text-[10px] uppercase font-bold text-green-500 border border-green-500/30';
+                
+                if (autoRole === 'player' && !myRole) {
+                    window.setRole('player');
                 }
-            });
-        }
-
-        function requestFullscreen() {
-            const el = document.documentElement;
-            if (el.requestFullscreen) el.requestFullscreen();
-            else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-            else if (el.mozRequestFullScreen) el.mozRequestFullScreen();
-        }
-
-        function initExperience() {
-            if (isMobile) {
-                try {
-                    requestFullscreen();
-                } catch(e) { console.log("Fullscreen not allowed"); }
+            } else {
+                signInAnonymously(auth).catch(e => showError("Firebase Login: " + e.message));
             }
+        });
+
+        document.getElementById('btn-skip-intro').onclick = () => {
+            document.getElementById('screen-intro').classList.add('hidden');
+            const iframe = document.getElementById('intro-video-iframe');
+            if (iframe) iframe.src = ""; 
             
-            startOverlay.style.opacity = '0';
-            setTimeout(() => {
-                startOverlay.style.display = 'none';
-                startExperience();
-            }, 600);
-        }
-
-        function playIntroMusic() {
-            if (audioHasStarted || !ytPlayer) return;
-            ytPlayer.setVolume(80);
-            ytPlayer.playVideo();
-            audioHasStarted = true;
-        }
-
-        window.onload = () => {
-            initSpaceScene();
+            document.getElementById('screen-admin').classList.remove('hidden');
+            document.getElementById('admin-lobby').classList.remove('hidden');
         };
 
-        function initSpaceScene() {
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(isMobile ? 75 : 45, window.innerWidth / window.innerHeight, 0.1, 5000);
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            threeContainer.appendChild(renderer.domElement);
-            
-            scene.add(new THREE.AmbientLight(0xffffff, 2));
-            
-            starGroup = new THREE.Group();
-            const starGeometry = new THREE.BufferGeometry();
-            const starVertices = [];
-            
-            for (let i = 0; i < (isMobile ? 4800 : 10800); i++) {
-                starVertices.push((Math.random()-0.5)*2500, (Math.random()-0.5)*2500, (Math.random()-0.5)*5000);
-            }
-            starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
-            const stars = new THREE.Points(starGeometry, new THREE.PointsMaterial({ size: 1.2, color: 0x81a0f4, transparent: true, opacity: 0.8 }));
-            starGroup.add(stars);
-            scene.add(starGroup);
+        window.setRole = async (role) => {
+            myRole = role;
+            document.getElementById('screen-role').classList.add('hidden');
 
-            const loader = new THREE.TextureLoader();
-            loader.setCrossOrigin('anonymous');
-
-            objectUrls.forEach((url, index) => {
-                loader.load(url, (tex) => {
-                    const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0 });
-                    const sprite = new THREE.Sprite(mat);
-                    let baseSize = isMobile ? 18 : 25;
-                    if (index === 0 || index === 2) baseSize = isMobile ? 30 : 45;
-                    sprite.scale.set(baseSize, baseSize * (tex.image.height / tex.image.width), 1);
-                    sprite.position.set((index % 2 === 0 ? 1.5 : -1.5) * (isMobile ? 25 : 40), (index === 1 ? -10 : 10), -1500);
-                    if (index === 2) {
-                        sprite.material.rotation = Math.PI; 
-                    }
-                    scene.add(sprite);
-                    floatingObjects.push(sprite);
+            if (role === 'admin') {
+                const iframe = document.getElementById('intro-video-iframe');
+                iframe.src = "https://www.youtube.com/embed/5PKjU_HA-eg?autoplay=1&rel=0&controls=0&loop=1&playlist=5PKjU_HA-eg";
+                document.getElementById('screen-intro').classList.remove('hidden');
+                
+                const baseStr = window.location.href.split('?')[0];
+                const playerUrl = baseStr + "?role=player";
+                document.getElementById('display-url').innerText = playerUrl;
+                
+                new QRCode(document.getElementById("qrcode-container"), {
+                    text: playerUrl, width: 200, height: 200, correctLevel: QRCode.CorrectLevel.M
                 });
-            });
-
-            loader.load('https://i.postimg.cc/5Nr3VrfQ/Google-Gemini-icon-2025-svg.png', (tex) => {
-                const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
-                geminiSprite = new THREE.Sprite(mat);
-                geminiSprite.scale.set(0.1, 0.1, 1);
-                geminiSprite.position.set(0, 0, -1200); 
-                scene.add(geminiSprite);
-            });
+            } else if (role === 'player') {
+                document.getElementById('screen-player').classList.remove('hidden');
+            }
             
-            camera.position.z = 200;
-            animate();
-        }
+            if (currentUser) initSync();
+        };
 
-        function prepareContentReveal() {
-            document.body.style.position = 'static';
-            document.body.style.overflowY = 'auto';
-            const main = document.getElementById('main-content');
-            main.style.opacity = '1';
-            main.style.visibility = 'visible';
-            gsap.from("#hero-reveal", { y: 40, opacity: 0, duration: 1.5, ease: "power4.out" });
-        }
+        function initSync() {
+            if (!currentUser) return;
 
-        function startExperience() {
-            playIntroMusic();
-            const tl = gsap.timeline();
-            tl.to("#loader-text", { opacity: 0, duration: 0.3 });
-            
-            tl.to(phoneImg, { 
-                scale: isMobile ? 1200 : 120, 
-                duration: 5.5, 
-                ease: "power3.in" 
-            });
-
-            tl.to(threeContainer, { opacity: 1, duration: 2.0 }, "-=2.5");
-            tl.to(phoneImg, { opacity: 0, duration: 0.5, ease: "power1.out" }, "-=0.5");
-            
-            tl.to(camera.position, { z: -1200, duration: 11.5, ease: "power2.inOut" }, "-=2.0");
-
-            floatingObjects.forEach((obj, index) => {
-                const startTime = index * 2.5 + 2;
-                tl.to(obj.material, { opacity: 1, duration: 1 }, `-=${11.5 - startTime}`);
-                tl.to(obj.position, { 
-                    x: (index % 2 === 0 ? -1.5 : 1.5) * (isMobile ? 30 : 50), 
-                    z: 600, duration: 6.6, ease: "none" 
-                }, `-=${11.5 - startTime}`);
-                tl.to(obj.material, { opacity: 0, duration: 1 }, `-=${11.5 - startTime - 5.5}`); 
-            });
-
-            tl.addLabel("starStart", "-=5.5");
-            tl.add(() => {
-                if(geminiSprite) {
-                    const s = isMobile ? 300 : 400; 
-                    gsap.to(geminiSprite.scale, { x: s, y: s, duration: 4.0, ease: "power2.in" });
+            onSnapshot(gameDocRef, (s) => {
+                if (s.exists()) {
+                    gameState = s.data();
+                    if (myRole === 'admin') renderAdmin();
+                    else renderPlayer();
+                    
+                    if (gameState.status === 'question' && gameState.startTime) {
+                        startTimer(gameState.startTime);
+                    } else {
+                        stopTimer();
+                    }
+                } else if (myRole === 'admin') {
+                    setDoc(gameDocRef, { status: 'lobby', qIndex: -1 });
                 }
-            }, "starStart");
+            }, (e) => showError("Game Sync: " + e.message));
 
-            let volumeProxy = { val: 80 };
-            tl.to(volumeProxy, { 
-                val: 0, 
-                duration: 2.0, 
-                ease: "power1.out",
-                onUpdate: () => {
-                    if(ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(volumeProxy.val);
+            onSnapshot(playersColRef, (s) => {
+                players = s.docs.map(d => ({ id: d.id, ...d.data() }));
+                players.sort((a, b) => b.score - a.score);
+                if (myRole === 'admin') {
+                    renderAdmin();
+                    checkAutoClose();
+                } else {
+                    renderPlayer(); 
                 }
-            }, "starStart+=2.0");
+            }, (e) => showError("Player Sync: " + e.message));
+        }
 
-            tl.to(introWrapper, { backgroundColor: "#fff", duration: 0.2 }, "starStart+=2.5");
-            tl.call(prepareContentReveal, null, "starStart+=2.6"); 
-            tl.to(introWrapper, { opacity: 0, duration: 0.5 }, "starStart+=2.7");
-            tl.set(introWrapper, { display: 'none' });
+        function startTimer(startTime) {
+            if (timerInterval) clearInterval(timerInterval);
             
-            tl.add(() => { if(ytPlayer) ytPlayer.stopVideo(); });
+            const duration = 15000; 
+            const tick = () => {
+                const elapsed = Date.now() - startTime;
+                const remaining = Math.max(0, Math.ceil((duration - elapsed) / 1000));
+                
+                if (myRole === 'admin') document.getElementById('admin-timer').innerText = remaining;
+                if (myRole === 'player') document.getElementById('player-timer').innerText = remaining;
+
+                if (remaining <= 0) {
+                    clearInterval(timerInterval);
+                    if (myRole === 'admin' && gameState.status === 'question' && !isRevealing) {
+                        triggerRevealSequence();
+                    }
+                }
+            };
+            
+            tick(); 
+            timerInterval = setInterval(tick, 1000);
         }
 
-        function animate() {
-            requestAnimationFrame(animate);
-            if (!renderer || !scene || !camera) return;
-            if(starGroup) starGroup.position.z += 5;
-            if(starGroup && starGroup.position.z > 1500) starGroup.position.z = 0;
-            if(geminiSprite) geminiSprite.material.rotation += 0.005;
-            floatingObjects.forEach((obj, i) => {
-                obj.material.rotation += (i % 2 === 0 ? 0.003 : -0.003);
-            });
-            renderer.render(scene, camera);
+        function stopTimer() {
+            if (timerInterval) clearInterval(timerInterval);
         }
 
-        function handleCalendarClick() {
-            const ua = navigator.userAgent;
-            const isApple = /iPhone|iPad|iPod/.test(ua);
-            const isAndroid = /Android/.test(ua);
-            const calendarId = "c_46447c8f79376cdb8f28dd083b39a50be052005cf394c5b7caf0fc4a4d04b977@group.calendar.google.com";
-            const calendarIcsLink = "https://calendar.google.com/calendar/ical/c_46447c8f79376cdb8f28dd083b39a50be052005cf394c5b7caf0fc4a4d04b977%40group.calendar.google.com/public/basic.ics";
-
-            if (isApple) {
-                const title = "Google Pixel 10a Launch Event";
-                const desc = `Sei dabei, hier klicken: https://youtube.com/live/Lieiv2eLSrA\n\nUnsere Google-Experten versorgen dich sofort mit allen Details.\nDas erwartet dich in unserem Live-Stream:\n\n🎥 Live-Reaction: Erlebe die Enthüllung in Echtzeit.\n💡 Exklusive Insights: Alles, was du über das neue Device wissen musst.\n🚀 Entertainment für alle: Egal ob Tech-Profi oder einfach nur neugierig.\n\nSichere dir jetzt deinen Platz!`;
-                const start = "20260218T180000Z";
-                const end = "20260218T184500Z"; 
-                const location = "YouTube Live";
-                const icsContent = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Innovation Labs//Pixel Event//DE\nBEGIN:VEVENT\nUID:pixel-launch-2026-ios-fix@innovationlabs\nDTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]+"Z"}\nDTSTART:${start}\nDTEND:${end}\nSUMMARY:${title}\nDESCRIPTION:${desc.replace(/\n/g, '\\n')}\nLOCATION:${location}\nURL:https://youtube.com/live/Lieiv2eLSrA\nEND:VEVENT\nEND:VCALENDAR`;
-                const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                window.location.href = url;
-            } else if (isAndroid) {
-                window.location.href = calendarIcsLink;
-            } else {
-                const webLink = `https://calendar.google.com/calendar/render?cid=${encodeURIComponent(calendarId)}`;
-                window.open(webLink, '_blank');
+        function checkAutoClose() {
+            if (gameState.status !== 'question' || isRevealing) return;
+            const totalPlayers = players.length;
+            if (totalPlayers === 0) return;
+            const answeredCount = players.filter(p => p.lastAnswerQ === gameState.qIndex).length;
+            document.getElementById('admin-answer-count').innerText = `${answeredCount} / ${totalPlayers}`;
+            
+            if (answeredCount === totalPlayers) {
+                setTimeout(() => {
+                    if (!isRevealing && gameState.status === 'question') triggerRevealSequence();
+                }, 500);
             }
         }
 
-        window.onresize = () => {
-            if (!camera || !renderer) return;
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        };
+        function triggerRevealSequence() {
+            if (isRevealing) return; 
+            isRevealing = true;
+            renderAdmin(); 
+            setTimeout(async () => {
+                await updateDoc(gameDocRef, { status: 'results' });
+                isRevealing = false;
+            }, 3000);
+        }
+
+        async function startGame() {
+            if (!currentUser) return;
+            await updateDoc(gameDocRef, { status: 'question', qIndex: 0, startTime: Date.now() });
+        }
+        
+        async function nextQuestion() {
+            if (gameState.qIndex < QUIZ_DATA.length - 1) {
+                await updateDoc(gameDocRef, { status: 'question', qIndex: gameState.qIndex + 1, startTime: Date.now() });
+            } else {
+                await updateDoc(gameDocRef, { status: 'podium' });
+            }
+        }
+        async function resetGame() {
+            await updateDoc(gameDocRef, { status: 'lobby', qIndex: -1 });
+            const pSnap = await getDocs(playersColRef);
+            for (const d of pSnap.docs) {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'players', d.id), { score: 0, lastAnswerQ: -1, answers: {} });
+            }
+        }
+
+        async function stopAndClear() {
+            if (!confirm("Alle Teilnehmer löschen und Quiz beenden?")) return;
+            try {
+                await updateDoc(gameDocRef, { status: 'lobby', qIndex: -1 });
+                const pSnap = await getDocs(playersColRef);
+                const deletions = pSnap.docs.map(d => deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'players', d.id)));
+                await Promise.all(deletions);
+                window.location.href = window.location.pathname; 
+            } catch (e) { showError("Clear Error: " + e.message); }
+        }
+
+        // CSV EXPORT FUNKTION
+        function downloadResults() {
+            if (players.length === 0) {
+                alert("Keine Spielerdaten vorhanden.");
+                return;
+            }
+
+            const questionHeaders = QUIZ_DATA.map((q, i) => `Frage ${i+1}: ${q.q.replace(/;/g, ',')}`).join(';');
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += `Platz;Spieler;Punkte;${questionHeaders}\n`;
+
+            players.forEach((p, index) => {
+                const answers = QUIZ_DATA.map((q, i) => {
+                    const choiceIdx = p.answers ? p.answers[i] : undefined;
+                    if (choiceIdx !== undefined && q.options[choiceIdx]) {
+                        return q.options[choiceIdx].replace(/;/g, ',');
+                    }
+                    return "-"; 
+                }).join(';');
+                
+                csvContent += `${index + 1};${p.name};${p.score};${answers}\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "quiz_ergebnisse.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        async function joinGame() {
+            const name = document.getElementById('player-name-input').value.trim();
+            if (!name || !currentUser) return;
+            const pDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'players', currentUser.uid);
+            await setDoc(pDocRef, { name, score: 0, lastAnswerQ: -1, answers: {} });
+            document.getElementById('player-login').classList.add('hidden');
+            document.getElementById('player-wait').classList.remove('hidden');
+        }
+
+        async function submitAnswer(idx) {
+            const me = players.find(p => p.id === currentUser.uid);
+            if (!me || me.lastAnswerQ === gameState.qIndex) return;
+            const correct = QUIZ_DATA[gameState.qIndex].correct === idx;
+            const timeTaken = Date.now() - gameState.startTime;
+            const pts = correct ? 500 + Math.max(0, Math.round(500 * (1 - timeTaken / 15000))) : 0;
+            
+            showLocalFeedback = true;
+            renderLocalFeedback(correct, pts);
+
+            const pDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'players', currentUser.uid);
+            
+            const answerField = `answers.${gameState.qIndex}`;
+            
+            await updateDoc(pDocRef, { 
+                score: (me.score || 0) + pts, 
+                lastAnswerQ: gameState.qIndex, 
+                lastCorrect: correct, 
+                lastPoints: pts,
+                [answerField]: idx 
+            });
+
+            setTimeout(() => {
+                showLocalFeedback = false;
+                renderPlayer(); 
+            }, 3000);
+        }
+
+        function renderLocalFeedback(correct, pts) {
+            const container = document.getElementById('player-local-feedback');
+            const card = document.getElementById('local-feedback-card');
+            const icon = document.getElementById('local-feedback-icon');
+            const title = document.getElementById('local-feedback-title');
+            const pointsEl = document.getElementById('local-feedback-points');
+
+            container.classList.remove('hidden');
+            document.getElementById('player-game').classList.add('hidden'); 
+            document.getElementById('player-timer-container').classList.add('hidden');
+
+            if (correct) {
+                card.className = "w-full max-w-sm p-12 rounded-[3.5rem] text-center bg-green-600 border-b-8 border-green-800 shadow-2xl";
+                icon.innerHTML = '<i data-lucide="check-circle-2" class="w-24 h-24 text-white"></i>';
+                title.innerText = "RICHTIG!";
+                pointsEl.innerText = `+${pts} PKT`;
+            } else {
+                card.className = "w-full max-w-sm p-12 rounded-[3.5rem] text-center bg-red-600 border-b-8 border-red-800 shadow-2xl";
+                icon.innerHTML = '<i data-lucide="x-circle" class="w-24 h-24 text-white"></i>';
+                title.innerText = "LEIDER FALSCH";
+                pointsEl.innerText = "0 PKT";
+            }
+            lucide.createIcons();
+        }
+
+        function renderAdmin() {
+            ['lobby', 'question', 'results', 'podium'].forEach(s => {
+                const el = document.getElementById(`admin-${s}`);
+                if (el) el.classList.add('hidden');
+            });
+            
+            const currentEl = document.getElementById(`admin-${gameState.status}`);
+            if (currentEl) currentEl.classList.remove('hidden');
+
+            if (gameState.status === 'lobby') {
+                document.getElementById('player-count').innerText = players.length;
+                document.getElementById('player-list').innerHTML = players.map(p => 
+                    `<span class="bg-white/20 text-white px-4 py-2 rounded-xl text-xs font-bold border border-white/30 animate-pulse">${p.name}</span>`
+                ).join('');
+                document.getElementById('btn-admin-start').disabled = players.length === 0;
+            }
+            if (gameState.status === 'question') {
+                const q = QUIZ_DATA[gameState.qIndex];
+                document.getElementById('q-number').innerText = gameState.qIndex + 1;
+                document.getElementById('q-total').innerText = QUIZ_DATA.length;
+                document.getElementById('q-text').innerText = q.q;
+                const colors = ['bg-kahoot-red', 'bg-kahoot-blue', 'bg-kahoot-yellow', 'bg-kahoot-green'];
+                const shapes = ['▲', '◆', '●', '■'];
+                
+                document.getElementById('q-options').innerHTML = q.options.map((opt, i) => {
+                    let extraClasses = "";
+                    if (isRevealing) {
+                        if (i === (q.correct)) extraClasses = "correct-highlight";
+                        else extraClasses = "dimmed-answer";
+                    }
+                    return `
+                    <div id="admin-opt-${i}" class="${colors[i]} p-8 rounded-3xl flex items-center gap-8 shadow-xl border-b-8 border-black/20 transition-all duration-300 ${extraClasses}">
+                        <span class="text-5xl font-black">${shapes[i]}</span>
+                        <span class="text-3xl font-black">${opt}</span>
+                    </div>
+                `}).join('');
+            }
+            if (gameState.status === 'results') {
+                document.getElementById('leaderboard-list').innerHTML = players.slice(0, 5).map((p, i) => `
+                    <div class="flex items-center justify-between bg-black/10 p-6 rounded-3xl border-l-8 border-white shadow-lg leaderboard-entry animate-in slide-in-from-left">
+                        <div class="flex items-center gap-6">
+                            <span class="text-2xl font-black text-white/60 w-10">#${i+1}</span>
+                            <span class="text-3xl font-black uppercase tracking-tight text-white">${p.name}</span>
+                        </div>
+                        <span class="text-4xl font-black text-white">${p.score} <span class="text-sm font-normal text-white/50">PKT</span></span>
+                    </div>
+                `).join('');
+                document.getElementById('btn-admin-next').innerText = gameState.qIndex < QUIZ_DATA.length - 1 ? 'NÄCHSTE FRAGE' : 'ZUM PODIUM';
+            }
+            if (gameState.status === 'podium') {
+                const top = players.slice(0, 3);
+                document.getElementById('podium-display').innerHTML = `
+                    <div class="flex flex-col items-center podium-bar podium-2">
+                        <span class="font-bold mb-2 text-xl text-slate-700">${top[1]?.name || '-'}</span>
+                        <div class="w-32 md:w-48 flex flex-col items-center justify-center h-full shadow-2xl rounded-t-[2.5rem] bg-gradient-to-b from-gray-300 to-gray-500 relative">
+                            <span class="text-6xl font-black text-white/80">2</span>
+                            <span class="absolute bottom-4 text-lg font-bold text-white/90">${top[1]?.score || 0} Pkt</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center podium-bar podium-1">
+                        <i data-lucide="medal" class="text-yellow-400 mb-2 animate-bounce"></i>
+                        <span class="text-4xl font-black mb-2 text-yellow-900 uppercase tracking-tighter italic">${top[0]?.name || '-'}</span>
+                        <div class="w-48 md:w-64 flex flex-col items-center justify-center h-full shadow-2xl rounded-t-[2.5rem] bg-gradient-to-b from-yellow-400 to-yellow-600 relative">
+                            <span class="text-8xl font-black text-yellow-900/50">1</span>
+                            <span class="absolute bottom-6 text-2xl font-black text-yellow-900">${top[0]?.score || 0} Pkt</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center podium-bar podium-3">
+                        <span class="font-bold mb-2 text-xl text-amber-900">${top[2]?.name || '-'}</span>
+                        <div class="w-32 md:w-48 flex flex-col items-center justify-center h-full shadow-2xl rounded-t-[2.5rem] bg-gradient-to-b from-orange-400 to-orange-700 relative">
+                            <span class="text-4xl font-black text-white/80">3</span>
+                            <span class="absolute bottom-4 text-lg font-bold text-white/90">${top[2]?.score || 0} Pkt</span>
+                        </div>
+                    </div>
+                `;
+                lucide.createIcons();
+                if (top[0]) setTimeout(() => confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } }), 2200);
+            }
+        }
+
+        function renderPlayer() {
+            const me = players.find(p => p.id === currentUser.uid);
+            if (!me) return;
+
+            if (showLocalFeedback) return;
+            document.getElementById('player-local-feedback').classList.add('hidden');
+
+            if (gameState.status === 'question') {
+                const currentQ = QUIZ_DATA[gameState.qIndex];
+                document.getElementById('player-opt-0').innerText = currentQ.options[0];
+                document.getElementById('player-opt-1').innerText = currentQ.options[1];
+                document.getElementById('player-opt-2').innerText = currentQ.options[2];
+                document.getElementById('player-opt-3').innerText = currentQ.options[3];
+
+                document.getElementById('player-wait').classList.add('hidden');
+                
+                if (me.lastAnswerQ === gameState.qIndex) { 
+                    document.getElementById('player-game').classList.add('hidden'); 
+                    document.getElementById('player-timer-container').classList.add('hidden');
+                    document.getElementById('player-wait').classList.remove('hidden'); 
+                    document.getElementById('player-wait-msg').innerText = "Schau rüber zum Bildschirm!";
+                } else { 
+                    document.getElementById('player-game').classList.remove('hidden'); 
+                    document.getElementById('player-timer-container').classList.remove('hidden');
+                }
+            }
+            else if (gameState.status === 'results') {
+                document.getElementById('player-game').classList.add('hidden');
+                document.getElementById('player-timer-container').classList.add('hidden');
+                document.getElementById('player-wait').classList.remove('hidden');
+                document.getElementById('player-wait-msg').innerText = "Blick zum Beamer...";
+            }
+            else if (gameState.status === 'podium') {
+                document.getElementById('player-game').classList.add('hidden');
+                document.getElementById('player-timer-container').classList.add('hidden');
+                document.getElementById('player-wait').classList.remove('hidden');
+                
+                const myRank = players.findIndex(p => p.id === currentUser.uid) + 1;
+                
+                if (myRank <= 3) {
+                    document.getElementById('player-wait-msg').innerHTML = `<h2 class="text-4xl font-black uppercase italic italic text-white">Danke fürs Mitmachen!</h2><p class="text-xl mt-4 text-white">Schau zum Podium!</p>`;
+                } else {
+                    document.getElementById('player-wait-msg').innerHTML = `
+                        <h2 class="text-4xl font-black uppercase italic italic text-white">Danke fürs Mitmachen!</h2>
+                        <div class="mt-8 bg-black/20 p-6 rounded-3xl">
+                            <p class="text-xl text-white/80 uppercase tracking-widest font-bold">Dein Ergebnis</p>
+                            <p class="text-6xl font-black text-white my-2">${me.score}</p>
+                            <p class="text-2xl font-bold text-white/90">Platz ${myRank}</p>
+                        </div>
+                    `;
+                }
+            }
+            else if (gameState.status === 'lobby') {
+                document.getElementById('player-wait').classList.remove('hidden');
+                document.getElementById('player-game').classList.add('hidden');
+                document.getElementById('player-timer-container').classList.add('hidden');
+                document.getElementById('player-wait-msg').innerText = "Schau rüber zum Bildschirm!";
+            }
+        }
+
+        document.getElementById('btn-choice-admin').onclick = () => window.setRole('admin');
+        document.getElementById('btn-choice-player').onclick = () => window.setRole('player');
+        document.getElementById('btn-admin-start').onclick = startGame;
+        document.getElementById('btn-admin-results').onclick = () => triggerRevealSequence();
+        document.getElementById('btn-admin-force-reveal').onclick = () => triggerRevealSequence();
+        document.getElementById('btn-admin-next').onclick = nextQuestion;
+        document.getElementById('btn-admin-reset').onclick = resetGame;
+        document.getElementById('btn-admin-stop').onclick = stopAndClear;
+        document.getElementById('btn-admin-export').onclick = downloadResults;
+        document.getElementById('btn-player-join').onclick = joinGame;
+        for (let i = 0; i < 4; i++) {
+            document.getElementById(`btn-ans-${i}`).onclick = () => submitAnswer(i);
+        }
     </script>
 </body>
 </html>
