@@ -34,7 +34,7 @@
             font-family: 'Google Sans', 'Roboto', 'Inter', sans-serif;
             overflow: hidden;
             overscroll-behavior-y: none;
-            position: fixed; /* Fixiert den Viewport gegen Browser-Leisten-Springen */
+            position: fixed;
         }
 
         #intro-wrapper {
@@ -75,7 +75,7 @@
             border: none;
             box-shadow: 0 0 50px rgba(129, 160, 244, 0.4);
             animation: shine 3s linear infinite, pulse 2s ease-in-out infinite;
-            z-index: 2001; /* Sicherstellen, dass der Button klickbar ist */
+            z-index: 2001;
         }
 
         @keyframes pulse {
@@ -104,7 +104,6 @@
             will-change: transform, opacity;
         }
 
-        /* Desktop Anpassung */
         @media (min-width: 768px) {
             #phone-static { 
                 max-height: 75vh;
@@ -171,6 +170,25 @@
         }
 
         .text-hero { font-size: clamp(2.5rem, 10vw, 8rem); line-height: 1.1; }
+
+        /* Video Container für Shorts (9:16) */
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 177.77%; /* 16/9 Ratio */
+            height: 0;
+            overflow: hidden;
+            max-width: 315px;
+            margin: 2rem auto;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
     </style>
 </head>
 <body>
@@ -202,30 +220,42 @@
             <div class="text-[10px] font-bold tracking-[0.3em] text-gray-400 uppercase">18.02.26</div>
         </nav>
 
-        <section class="min-h-[80vh] flex flex-col justify-center items-center px-8 text-center">
+        <!-- 1. Banner Foto ganz nach oben -->
+        <div class="w-full px-4 mb-8">
+            <img src="https://i.postimg.cc/0QkGBfYc/Bildschirmfoto-2026-02-03-um-10-14-20.png" 
+                 alt="Event Banner" 
+                 class="mx-auto w-full max-w-[600px] h-auto object-contain rounded-2xl shadow-2xl opacity-90 border border-white/10">
+        </div>
+
+        <section class="flex flex-col justify-center items-center px-8 text-center">
             <div id="hero-reveal">
-                <span class="text-[10px] font-bold tracking-[0.5em] text-blue-400 mb-6 block uppercase">Ein neuer Horizont</span>
+                <!-- 2. Text "Ein neuer Horizont" entfernt -->
                 <h1 class="text-hero font-bold tracking-tighter mb-8">
                     Verpasse nicht <br> <span class="gradient-text">den Augenblick...</span>
                 </h1>
                 
-                <!-- TEXT ENTFERNT: Computing neu definiert... -->
-
-                <button onclick="handleCalendarClick()" class="magic-button">
+                <button onclick="handleCalendarClick()" class="magic-button mb-8">
                     TERMIN SICHERN
                 </button>
 
-                <!-- Bild unter dem Button -->
-                <img src="https://i.postimg.cc/0QkGBfYc/Bildschirmfoto-2026-02-03-um-10-14-20.png" 
-                     alt="Event Preview" 
-                     class="mt-12 mx-auto w-full max-w-[300px] md:max-w-[500px] h-auto object-contain rounded-xl shadow-2xl opacity-90">
+                <!-- 4. Datum & Zeit unter dem Button, fett und mittelgroß -->
+                <p class="text-2xl md:text-3xl font-bold tracking-tight text-white mb-8">
+                    18. Februar 2026 | 19:00 Uhr | Livestream
+                </p>
+
+                <!-- 6. Video unter dem Datum -->
+                <div class="video-wrapper">
+                    <iframe src="https://www.youtube.com/embed/5PKjU_HA-eg" 
+                            title="Pixel Event Preview" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowfullscreen></iframe>
+                </div>
             </div>
         </section>
 
-        <!-- Abstand nach oben (pt) verringert von py-32 auf pt-12, damit es näher am Bild ist -->
-        <section id="event" class="pt-12 pb-32 px-8 text-center">
-            <h2 class="text-3xl font-bold mb-4 tracking-tight">Save the Date</h2>
-            <p class="text-gray-400 text-lg mb-8">18. Februar 2026 | 19:00 Uhr | Livestream</p>
+        <!-- 5. Save the Date Headline entfernt, Section verkleinert -->
+        <section id="event" class="pb-24 px-8 text-center">
             <div class="w-20 h-1 bg-gradient-to-r from-blue-500 via-red-500 to-yellow-500 mx-auto rounded-full"></div>
         </section>
 
@@ -319,16 +349,10 @@
                     let baseSize = isMobile ? 18 : 25;
                     if (index === 0 || index === 2) baseSize = isMobile ? 30 : 45;
                     sprite.scale.set(baseSize, baseSize * (tex.image.height / tex.image.width), 1);
-                    
-                    // Initiale Position (Z weit hinten)
                     sprite.position.set((index % 2 === 0 ? 1.5 : -1.5) * (isMobile ? 25 : 40), (index === 1 ? -10 : 10), -1500);
-
-                    // --- FIX: Tensor G4 (Index 2) um 180 Grad drehen ---
-                    // Damit die Schrift "G4" richtig herum ist und nicht auf dem Kopf steht
                     if (index === 2) {
                         sprite.material.rotation = Math.PI; 
                     }
-
                     scene.add(sprite);
                     floatingObjects.push(sprite);
                 });
@@ -358,15 +382,12 @@
         function startExperience() {
             playIntroMusic();
             const tl = gsap.timeline();
-
             tl.to("#loader-text", { opacity: 0, duration: 0.3 });
-
             tl.to(phoneImg, { 
                 scale: isMobile ? 1200 : 120, 
                 duration: 5.5, 
                 ease: "power3.in" 
             });
-
             tl.to(threeContainer, { opacity: 1, duration: 2.0 }, "-=2.5");
             tl.to(phoneImg, { opacity: 0, duration: 0.5, ease: "power1.out" }, "-=0.5");
             tl.to(camera.position, { z: -1200, duration: 11, ease: "power2.inOut" }, "-=2.0");
@@ -374,38 +395,24 @@
             floatingObjects.forEach((obj, index) => {
                 const startTime = index * 2.5 + 2;
                 tl.to(obj.material, { opacity: 1, duration: 1 }, `-=${11 - startTime}`);
-                
                 tl.to(obj.position, { 
                     x: (index % 2 === 0 ? -1.5 : 1.5) * (isMobile ? 30 : 50), 
                     z: 600, duration: 6.6, ease: "none" 
                 }, `-=${11 - startTime}`);
-                
                 tl.to(obj.material, { opacity: 0, duration: 1 }, `-=${11 - startTime - 5.5}`); 
             });
 
-            // WICHTIG: Label setzen, um Stern und Blitz perfekt zu synchronisieren
             tl.addLabel("starStart", "-=5.5");
-
             tl.add(() => {
                 if(geminiSprite) {
-                    // Skalierung MASSIV erhöht (300/400), damit sicher ALLES weiß/bedeckt ist
                     const s = isMobile ? 300 : 400; 
-                    // Kürzer und knackiger (4s), "in" Easing für den Explosions-Effekt
                     gsap.to(geminiSprite.scale, { x: s, y: s, duration: 4.0, ease: "power2.in" });
                 }
             }, "starStart");
 
-            // Der weiße Blitz kommt jetzt FIX 2.5s nach Start des Sterns.
-            // Zu diesem Zeitpunkt ist der Stern schon riesig und füllt den Screen.
-            // Kein Weltall mehr möglich.
             tl.to(introWrapper, { backgroundColor: "#fff", duration: 0.2 }, "starStart+=2.5");
-            
-            // Content darunter vorbereiten
             tl.call(prepareContentReveal, null, "starStart+=2.6"); 
-            
-            // Weißblende wegnehmen
             tl.to(introWrapper, { opacity: 0, duration: 0.5 }, "starStart+=2.7");
-            
             tl.set(introWrapper, { display: 'none' });
         }
 
@@ -425,57 +432,22 @@
             const ua = navigator.userAgent;
             const isApple = /iPhone|iPad|iPod/.test(ua);
             const isAndroid = /Android/.test(ua);
-
-            // Die Kalender-ID für die Web-Version (aus dem Link extrahiert und decodiert)
             const calendarId = "c_46447c8f79376cdb8f28dd083b39a50be052005cf394c5b7caf0fc4a4d04b977@group.calendar.google.com";
             const calendarIcsLink = "https://calendar.google.com/calendar/ical/c_46447c8f79376cdb8f28dd083b39a50be052005cf394c5b7caf0fc4a4d04b977%40group.calendar.google.com/public/basic.ics";
 
             if (isApple) {
-                // --- IOS: Interner Blob ---
                 const title = "Google Pixel 10a Launch Event";
-                const desc = `Sei dabei, hier klicken: https://youtube.com/live/Lieiv2eLSrA
-
-Unsere Google-Experten versorgen dich sofort mit allen Details.
-Das erwartet dich in unserem Live-Stream:
-
-🎥 Live-Reaction: Erlebe die Enthüllung in Echtzeit.
-💡 Exklusive Insights: Alles, was du über das neue Device wissen musst.
-🚀 Entertainment für alle: Egal ob Tech-Profi oder einfach nur neugierig.
-
-Sichere dir jetzt deinen Platz!`;
-                
+                const desc = `Sei dabei, hier klicken: https://youtube.com/live/Lieiv2eLSrA\n\nUnsere Google-Experten versorgen dich sofort mit allen Details.\nDas erwartet dich in unserem Live-Stream:\n\n🎥 Live-Reaction: Erlebe die Enthüllung in Echtzeit.\n💡 Exklusive Insights: Alles, was du über das neue Device wissen musst.\n🚀 Entertainment für alle: Egal ob Tech-Profi oder einfach nur neugierig.\n\nSichere dir jetzt deinen Platz!`;
                 const start = "20260218T180000Z";
                 const end = "20260218T184500Z"; 
                 const location = "YouTube Live";
-
-                const icsContent = `BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//Innovation Labs//Pixel Event//DE
-BEGIN:VEVENT
-UID:pixel-launch-2026-ios-fix@innovationlabs
-DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]+"Z"}
-DTSTART:${start}
-DTEND:${end}
-SUMMARY:${title}
-DESCRIPTION:${desc.replace(/\n/g, '\\n')}
-LOCATION:${location}
-URL:https://youtube.com/live/Lieiv2eLSrA
-END:VEVENT
-END:VCALENDAR`;
-
+                const icsContent = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Innovation Labs//Pixel Event//DE\nBEGIN:VEVENT\nUID:pixel-launch-2026-ios-fix@innovationlabs\nDTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]+"Z"}\nDTSTART:${start}\nDTEND:${end}\nSUMMARY:${title}\nDESCRIPTION:${desc.replace(/\n/g, '\\n')}\nLOCATION:${location}\nURL:https://youtube.com/live/Lieiv2eLSrA\nEND:VEVENT\nEND:VCALENDAR`;
                 const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
                 const url = URL.createObjectURL(blob);
                 window.location.href = url;
-
             } else if (isAndroid) {
-                // --- ANDROID: Direkter ICS Link ---
-                // location.href ist hier zuverlässiger als window.open
                 window.location.href = calendarIcsLink;
-
             } else {
-                // --- CHROMEBOOK / DESKTOP (Windows, Mac, Linux) ---
-                // Hier öffnen wir die Google Kalender Web-Oberfläche zum Abonnieren.
-                // Das verhindert Dateiformat-Fehler auf Chrome OS.
                 const webLink = `https://calendar.google.com/calendar/render?cid=${encodeURIComponent(calendarId)}`;
                 window.open(webLink, '_blank');
             }
