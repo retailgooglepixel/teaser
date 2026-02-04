@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <!-- Mobile Web App Tags für "Zum Home-Bildschirm hinzufügen" -->
+    <!-- Mobile Web App Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
@@ -15,7 +15,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <!-- YouTube IFrame API für den Sound -->
     <script src="https://www.youtube.com/iframe_api"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     
@@ -106,12 +105,6 @@
             will-change: transform, opacity;
         }
 
-        @media (min-width: 768px) {
-            #phone-static { 
-                max-height: 75vh;
-            }
-        }
-
         #three-canvas-container {
             position: absolute;
             top: 0; left: 0;
@@ -173,9 +166,10 @@
 
         .text-hero { font-size: clamp(2.5rem, 10vw, 8rem); line-height: 1.1; }
 
+        /* Responsiver Video Wrapper */
         .video-wrapper {
             position: relative;
-            padding-bottom: 177.77%; /* 9:16 Ratio */
+            padding-bottom: 177.77%; /* Mobil 9:16 */
             height: 0;
             overflow: hidden;
             width: 100%;
@@ -185,6 +179,15 @@
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
             background: #000;
         }
+
+        @media (min-width: 1024px) {
+            .video-wrapper {
+                padding-bottom: 56.25%; /* Desktop 16:9 */
+                max-width: 900px; /* Breitere Darstellung */
+                border-radius: 0.75rem;
+            }
+        }
+
         .video-wrapper iframe {
             position: absolute;
             top: 0;
@@ -258,18 +261,7 @@
             Tel.: 069 405 625 0 | E-Mail: info@tmsgmbh.de</p>
 
             <h3 class="font-bold text-white mt-6 mb-2">Registrierung; Zwecke und Rechtsgrundlage</h3>
-            <p class="mb-4">Wir verarbeiten die personenbezogenen Daten unserer Kunden im Rahmen des Google Belohnungssystems, um die Teilnahme an Produkttrainings zu dokumentieren und die Versendung etwaiger Geschenke zu ermöglichen und aus den von Ihnen zur Verfügung gestellten Bildern und Videos Content für unsere digitale Trainingsplattform (GRT) zu erstellen. Zu den verarbeiteten Daten gehören Name, Adresse, E-Mail sowie Bild- und Videomaterial.</p>
-            <p class="mb-4">Die Verarbeitung erfolgt auf Grundlage des Art. 6 Abs. 1 lit. b DSGVO (Durchführung Bestellvorgänge) und c DSGVO (gesetzlich erforderliche Archivierung). Die von Ihnen gemachten Angaben sowie das Bild- und Videomaterial sind zur Durchführung des Belohnungssystems erforderlich.</p>
-
-            <h3 class="font-bold text-white mt-6 mb-2">Empfänger und Drittstaaten</h3>
-            <p class="mb-4">Empfänger von Daten sind Mitarbeiter innerhalb unseres Unternehmens, die diese zur Bearbeitung der genannten Zwecke benötigen. Die Daten offenbaren wir gegenüber Dritten nur im Rahmen der Auslieferung oder im Rahmen der gesetzlichen Erlaubnisse und Pflichten gegenüber Rechtsberatern und Behörden. Die Daten werden nur dann in Drittländern verarbeitet, wenn dies zur Vertragserfüllung erforderlich ist.</p>
-
-            <h3 class="font-bold text-white mt-6 mb-2">Speicherdauer</h3>
-            <p class="mb-4">Wir speichern Ihre personenbezogenen Daten nur so lange, wie dies zur Erreichung der hier genannten Zwecke oder zur Erfüllung unserer vertraglichen oder gesetzlichen Pflichten erforderlich ist. Die Löschung Ihrer Daten im Zusammenhang mit der Registrierung auf der Gewinnspiel Plattform erfolgt nach Ablauf gesetzlicher Gewährleistungspflichten. Die Erforderlichkeit der Aufbewahrung der Daten wird alle drei Jahre überprüft.</p>
-
-            <h3 class="font-bold text-white mt-6 mb-2">Ihre Rechte nach der DSGVO</h3>
-            <p class="mb-4">Sie haben das Recht auf Auskunft (Art. 15), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung der Verarbeitung (Art. 18) und Datenübertragbarkeit (Art. 20). Darüber hinaus haben Sie ein Beschwerderecht bei einer Datenschutzaufsichtsbehörde.</p>
-            <p class="mb-4">Soweit die Verarbeitung auf Grundlage von Art. 6 Abs. 1 Buchstabe f DSGVO erfolgt, haben Sie das Recht auf Widerspruch (Art. 21). Eine erteilte Einwilligung können Sie jederzeit mit Wirkung für die Zukunft widerrufen.</p>
+            <p class="mb-4">Wir verarbeiten die personenbezogenen Daten unserer Kunden im Rahmen des Google Belohnungssystems, um die Teilnahme an Produkttrainings zu dokumentieren und die Versendung etwaiger Geschenke zu ermöglichen und aus den von Ihnen zur Verfügung gestellten Bildern und Videos Content für unsere digitale Trainingsplattform (GRT) zu erstellen.</p>
 
             <h3 class="font-bold text-white mt-6 mb-2">Datenschutzbeauftragter</h3>
             <p class="mb-6">Herr Rechtsanwalt Stefan Hohl<br>
@@ -290,14 +282,8 @@
             <div class="text-[10px] font-bold tracking-[0.3em] text-gray-400 uppercase">18.02.26</div>
         </nav>
 
-        <div class="w-full px-4 mb-8">
-            <img src="https://i.postimg.cc/0QkGBfYc/Bildschirmfoto-2026-02-03-um-10-14-20.png" 
-                 alt="Event Banner" 
-                 class="mx-auto w-full max-w-[600px] h-auto object-contain rounded-2xl shadow-2xl opacity-90 border border-white/10">
-        </div>
-
-        <section class="flex flex-col justify-center items-center px-8 text-center">
-            <div id="hero-reveal">
+        <section class="flex flex-col justify-center items-center px-8 text-center mt-10">
+            <div id="hero-reveal" class="w-full">
                 <h1 class="text-hero font-bold tracking-tighter mb-10">
                     Verpasse nicht <br> <span class="gradient-text">den Augenblick...</span>
                 </h1>
@@ -306,13 +292,13 @@
                     TERMIN SICHERN
                 </button>
 
-                <p class="text-2xl md:text-4xl font-black tracking-tight text-white mb-6 uppercase">
+                <p class="text-2xl md:text-4xl font-black tracking-tight text-white mb-10 uppercase">
                     18. Februar 2026 | 19:00 Uhr | Livestream
                 </p>
 
                 <div class="video-wrapper">
-                    <iframe src="https://www.youtube.com/embed/5PKjU_HA-eg" 
-                            title="Pixel Event Preview" 
+                    <iframe src="https://www.youtube.com/embed/5PKjU_HA-eg?modestbranding=1&rel=0&controls=1" 
+                            title="Event Video" 
                             frameborder="0" 
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                             allowfullscreen></iframe>
@@ -332,7 +318,6 @@
     </div>
 
     <script>
-        // Sicherheits-Platzhalter für API-Key (Umgebung liefert Key zur Laufzeit)
         const apiKey = ""; 
 
         let scene, camera, renderer, starGroup, geminiSprite;
@@ -498,9 +483,9 @@
             const calendarIcsLink = "https://calendar.google.com/calendar/ical/c_46447c8f79376cdb8f28dd083b39a50be052005cf394c5b7caf0fc4a4d04b977%40group.calendar.google.com/public/basic.ics";
 
             if (isApple) {
-                const title = "Google Pixel 10a Launch Event";
-                const desc = `Sei dabei, hier klicken: https://youtube.com/live/Lieiv2eLSrA\n\nUnsere Google-Experten versorgen dich sofort mit allen Details.\nSichere dir jetzt deinen Platz!`;
-                const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Innovation Labs//Pixel Event//DE\nBEGIN:VEVENT\nUID:pixel-launch-2026-ios@innovationlabs\nDTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]+"Z"}\nDTSTART:20260218T180000Z\nDTEND:20260218T184500Z\nSUMMARY:${title}\nDESCRIPTION:${desc.replace(/\n/g, '\\n')}\nLOCATION:YouTube Live\nURL:https://youtube.com/live/Lieiv2eLSrA\nEND:VEVENT\nEND:VCALENDAR`;
+                const title = "Launch Event";
+                const desc = `Sei dabei, hier klicken: https://youtube.com/live/Lieiv2eLSrA\n\nUnsere Experten versorgen dich sofort mit allen Details.\nSichere dir jetzt deinen Platz!`;
+                const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Innovation//Event//DE\nBEGIN:VEVENT\nUID:launch-2026-ios@retail\nDTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]+"Z"}\nDTSTART:20260218T180000Z\nDTEND:20260218T184500Z\nSUMMARY:${title}\nDESCRIPTION:${desc.replace(/\n/g, '\\n')}\nLOCATION:YouTube Live\nURL:https://youtube.com/live/Lieiv2eLSrA\nEND:VEVENT\nEND:VCALENDAR`;
                 const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
                 window.location.href = URL.createObjectURL(blob);
             } else if (isAndroid) {
