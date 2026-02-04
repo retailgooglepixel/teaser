@@ -197,6 +197,35 @@
             width: 1px; height: 1px;
             opacity: 0; pointer-events: none;
         }
+
+        /* Modal Styles für Datenschutz */
+        #legal-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 5000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        #legal-modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: #111;
+            width: 100%;
+            max-width: 600px;
+            max-height: 80vh;
+            border-radius: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+            scrollbar-width: thin;
+            scrollbar-color: #333 #111;
+        }
     </style>
 </head>
 <body>
@@ -218,14 +247,50 @@
         <div id="loader-text">Wird vorbereitet...</div>
     </div>
 
+    <!-- Modal für Datenschutz & Impressum -->
+    <div id="legal-modal">
+        <div class="modal-content text-left text-sm leading-relaxed text-gray-300">
+            <button onclick="toggleLegal()" class="absolute top-4 right-4 text-white text-2xl">&times;</button>
+            <h2 class="text-xl font-bold mb-6 text-white">Datenschutz & Impressum</h2>
+            
+            <p class="mb-4"><strong>Einwilligung:</strong> Ich bin damit einverstanden, dass meine von mir angegebenen personenbezogenen Daten (Name, Adresse, Email sowie Bild- und Videomaterial) zur Abwicklung des Google Belohnungssystems, d.h. die Dokumentation der Teilnahme an Produkttrainings, die Erfassung der gesammelten Punkte und die Auslieferung von Prämien, von der TMS Personal GmbH verarbeitet und genutzt werden dürfen. ¹</p>
+            
+            <p class="mb-4 text-xs italic">¹Name und Kontaktdaten des für die Verarbeitung Verantwortlichen<br>
+            Verantwortlicher im Sinne der EU Datenschutz-Grundverordnung (DSGVO) ist:<br>
+            TMS Personal GmbH, Hafenallee 57, 63067 Offenbach (im Folgenden als „wir“ bezeichnet)<br>
+            Tel.: 069 405 625 0 | E-Mail: info@tmsgmbh.de</p>
+
+            <h3 class="font-bold text-white mt-6 mb-2">Registrierung; Zwecke und Rechtsgrundlage</h3>
+            <p class="mb-4">Wir verarbeiten die personenbezogenen Daten unserer Kunden im Rahmen des Google Belohnungssystems, um die Teilnahme an Produkttrainings zu dokumentieren und die Versendung etwaiger Geschenke zu ermöglichen und aus den von Ihnen zur Verfügung gestellten Bildern und Videos Content für unsere digitale Trainingsplattform (GRT) zu erstellen. Zu den verarbeiteten Daten gehören Name, Adresse, E-Mail sowie Bild- und Videomaterial.</p>
+            <p class="mb-4">Die Verarbeitung erfolgt auf Grundlage des Art. 6 Abs. 1 lit. b DSGVO (Durchführung Bestellvorgänge) und c DSGVO (gesetzlich erforderliche Archivierung). Die von Ihnen gemachten Angaben sowie das Bild- und Videomaterial sind zur Durchführung des Belohnungssystems erforderlich.</p>
+
+            <h3 class="font-bold text-white mt-6 mb-2">Empfänger und Drittstaaten</h3>
+            <p class="mb-4">Empfänger von Daten sind Mitarbeiter innerhalb unseres Unternehmens, die diese zur Bearbeitung der genannten Zwecke benötigen. Die Daten offenbaren wir gegenüber Dritten nur im Rahmen der Auslieferung oder im Rahmen der gesetzlichen Erlaubnisse und Pflichten gegenüber Rechtsberatern und Behörden. Die Daten werden nur dann in Drittländern verarbeitet, wenn dies zur Vertragserfüllung erforderlich ist.</p>
+
+            <h3 class="font-bold text-white mt-6 mb-2">Speicherdauer</h3>
+            <p class="mb-4">Wir speichern Ihre personenbezogenen Daten nur so lange, wie dies zur Erreichung der hier genannten Zwecke oder zur Erfüllung unserer vertraglichen oder gesetzlichen Pflichten erforderlich ist. Die Löschung Ihrer Daten im Zusammenhang mit der Registrierung auf der Gewinnspiel Plattform erfolgt nach Ablauf gesetzlicher Gewährleistungspflichten. Die Erforderlichkeit der Aufbewahrung der Daten wird alle drei Jahre überprüft.</p>
+
+            <h3 class="font-bold text-white mt-6 mb-2">Ihre Rechte nach der DSGVO</h3>
+            <p class="mb-4">Sie haben das Recht auf Auskunft (Art. 15), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung der Verarbeitung (Art. 18) und Datenübertragbarkeit (Art. 20). Darüber hinaus haben Sie ein Beschwerderecht bei einer Datenschutzaufsichtsbehörde.</p>
+            <p class="mb-4">Soweit die Verarbeitung auf Grundlage von Art. 6 Abs. 1 Buchstabe f DSGVO erfolgt, haben Sie das Recht auf Widerspruch (Art. 21). Eine erteilte Einwilligung können Sie jederzeit mit Wirkung für die Zukunft widerrufen.</p>
+
+            <h3 class="font-bold text-white mt-6 mb-2">Datenschutzbeauftragter</h3>
+            <p class="mb-6">Herr Rechtsanwalt Stefan Hohl<br>
+            Brunnenstraße 23, 63477 Maintal<br>
+            info@h-kanzlei.de</p>
+
+            <button onclick="toggleLegal()" class="w-full bg-white text-black py-3 rounded-full font-bold">Schließen</button>
+        </div>
+    </div>
+
     <div id="main-content">
         <div class="bg-glow">
             <div class="glow-circle w-[500px] h-[500px] top-[-10%] left-[-10%]" style="background: var(--iris-color);"></div>
             <div class="glow-circle w-[400px] h-[400px] bottom-[-10%] right-[-10%]" style="background: var(--star-blue);"></div>
         </div>
 
-        <nav class="w-full py-8 px-8 flex justify-between items-center">
-            <div class="text-[10px] font-bold tracking-[0.2em] text-white/40">INNOVATION</div>
+        <nav class="w-full py-8 px-8 flex justify-center items-center">
+            <!-- INNOVATION TEXT ENTFERNT -->
             <div class="text-[10px] font-bold tracking-[0.3em] text-gray-400 uppercase">18.02.26</div>
         </nav>
 
@@ -259,12 +324,15 @@
             </div>
         </section>
 
-        <section id="event" class="pb-24 px-8 text-center">
+        <section id="event" class="pb-12 px-8 text-center">
             <div class="w-20 h-1 bg-gradient-to-r from-blue-500 via-red-500 to-yellow-500 mx-auto rounded-full"></div>
         </section>
 
-        <footer class="py-12 border-t border-white/5 text-center text-[10px] tracking-[0.4em] text-gray-700 uppercase">
-            &copy; 2026 Innovation Labs
+        <footer class="py-12 border-t border-white/5 text-center flex flex-col items-center">
+            <!-- INNOVATION LABS TEXT ENTFERNT -->
+            <button onclick="toggleLegal()" class="text-[10px] tracking-[0.3em] text-gray-500 hover:text-gray-300 transition-colors uppercase">
+                Datenschutz & Impressum
+            </button>
         </footer>
     </div>
 
@@ -278,6 +346,7 @@
         const introWrapper = document.getElementById('intro-wrapper');
         const threeContainer = document.getElementById('three-canvas-container');
         const startOverlay = document.getElementById('start-overlay');
+        const legalModal = document.getElementById('legal-modal');
 
         const isMobile = window.innerWidth < 768;
 
@@ -286,6 +355,15 @@
             'https://i.postimg.cc/GtSmtHWr/google-pixel-buds-a-series-sea.png',
             'https://i.postimg.cc/vT1dPXKx/Google-Tensor-G4-1.jpg'
         ];
+
+        function toggleLegal() {
+            legalModal.classList.toggle('active');
+            if(legalModal.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        }
 
         // YouTube Player initialisieren
         function onYouTubeIframeAPIReady() {
@@ -402,7 +480,6 @@
             const tl = gsap.timeline();
             tl.to("#loader-text", { opacity: 0, duration: 0.3 });
             
-            // Telefon Zoom
             tl.to(phoneImg, { 
                 scale: isMobile ? 1200 : 120, 
                 duration: 5.5, 
@@ -412,7 +489,6 @@
             tl.to(threeContainer, { opacity: 1, duration: 2.0 }, "-=2.5");
             tl.to(phoneImg, { opacity: 0, duration: 0.5, ease: "power1.out" }, "-=0.5");
             
-            // Flugdauer angepasst auf ca. 11.5s nach dem Telefonzoom -> Total ca. 15s
             tl.to(camera.position, { z: -1200, duration: 11.5, ease: "power2.inOut" }, "-=2.0");
 
             floatingObjects.forEach((obj, index) => {
@@ -433,7 +509,6 @@
                 }
             }, "starStart");
 
-            // --- Sound Fade Out Logik ---
             let volumeProxy = { val: 80 };
             tl.to(volumeProxy, { 
                 val: 0, 
@@ -444,13 +519,11 @@
                 }
             }, "starStart+=2.0");
 
-            // Flash & Reveal
             tl.to(introWrapper, { backgroundColor: "#fff", duration: 0.2 }, "starStart+=2.5");
             tl.call(prepareContentReveal, null, "starStart+=2.6"); 
             tl.to(introWrapper, { opacity: 0, duration: 0.5 }, "starStart+=2.7");
             tl.set(introWrapper, { display: 'none' });
             
-            // Video am Ende stoppen
             tl.add(() => { if(ytPlayer) ytPlayer.stopVideo(); });
         }
 
